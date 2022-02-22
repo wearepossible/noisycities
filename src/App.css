@@ -1,0 +1,97 @@
+@import '~antd/dist/antd.css';
+
+.App {
+  text-align: center;
+}
+
+.App-logo {
+  height: 40vmin;
+  pointer-events: none;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .App-logo {
+    animation: App-logo-spin infinite 20s linear;
+  }
+}
+
+.App-header {
+  background-color: #282c34;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: calc(10px + 2vmin);
+  color: white;
+}
+
+.App-link {
+  color: #61dafb;
+}
+
+@keyframes App-logo-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.ant-tabs-ink-bar {
+  position: absolute;
+  background: rgb(188, 9, 120);
+}
+
+.ant-tabs-tab.ant-tabs-tab-active .ant-tabs-tab-btn {
+  color: rgb(188, 9, 120);
+  font-weight: 600;
+}
+
+.ant-tabs-card > div > .ant-tabs-nav .ant-tabs-tab-active {
+  color: rgb(188, 9, 120);
+  background: #fff;
+}
+
+.ant-tabs > div > .ant-tabs-nav .ant-tabs-nav-add:hover {
+  color: rgb(188, 9, 120);
+}
+.ant-tabs > .ant-tabs-nav .ant-tabs-nav-add:active,
+.ant-tabs > div > .ant-tabs-nav .ant-tabs-nav-add:active,
+.ant-tabs > .ant-tabs-nav .ant-tabs-nav-add:focus,
+.ant-tabs > div > .ant-tabs-nav .ant-tabs-nav-add:focus {
+  color: rgb(188, 9, 120);
+}
+
+.ant-tabs-tab-btn:focus,
+.ant-tabs-tab-remove:focus,
+.ant-tabs-tab-btn:active,
+.ant-tabs-tab-remove:active {
+  color: rgb(188, 9, 120);
+}
+
+.ant-tabs-tab.ant-tabs-tab-active .ant-tabs-tab-btn {
+  color: rgb(188, 9, 120);
+  font-weight: 500;
+}
+
+.ant-tabs-tab-btn:focus,
+.ant-tabs-tab-remove:focus,
+.ant-tabs-tab-btn:active,
+.ant-tabs-tab-remove:active {
+  color: rgb(188, 9, 120);
+}
+
+.ant-tabs-tab:hover {
+  color: rgb(188, 9, 120);
+}
+
+.tabs-extra-text {
+  margin-right: 16px;
+}
+
+.ant-row-rtl .tabs-extra-text {
+  margin-right: 0;
+  margin-left: 16px;
+}
