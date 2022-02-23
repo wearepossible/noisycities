@@ -3,7 +3,7 @@ import { Button, Tooltip } from 'antd'
 import { SoundOutlined } from '@ant-design/icons';
 
 import GaugeChart from './charts/SoundGaugeChart/SoundGaugeChartComponent'
-import logo from './assets/Jetpack-small.png'
+//import logo from './assets/Jetpack-small.png'
 
 const legendStyle = {
   position: 'absolute',

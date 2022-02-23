@@ -1,7 +1,7 @@
 /* eslint-disable no-mixed-operators */
 import React, { useState, useEffect }  from 'react';
-import { DeckGL, FlyToInterpolator }  from 'deck.gl';
-import { ScatterplotLayer } from '@deck.gl/layers';
+import { DeckGL }  from 'deck.gl';
+//import { ScatterplotLayer } from '@deck.gl/layers';
 import { useNavigate, useLocation } from "react-router-dom";
 import ReactMapGL, { NavigationControl, _MapContext as MapContext }  from "react-map-gl";
 import nearestColor from 'nearest-color';
@@ -179,7 +179,7 @@ function App() {
   const [volume, setVolume] = useState(0)
   const [muted, setMuted] = useState(true)
   const [openDrawer, setOpenDrawer] = useState(true)
-  const [layers, setLayers] = useState(null)
+  const [layers] = useState(null)
   const [city, setCity] = useState(url.get('city') || 'paris')
   const [viewState, setViewState] = useState(INITIAL_VIEW_STATE);
 
@@ -197,6 +197,7 @@ function App() {
       setViewState(newViewState)
       navigate('/?city='+city, { replace: true })
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [city]);
 
   const onViewStateChange = ({viewState}) => {
