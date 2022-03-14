@@ -14,3 +14,17 @@ body {
 code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New', monospace;
 }
+
+a {
+  color: #bc0978 !important;
+}
+
+::selection {
+    color: #fff !important;
+    background: #bc0978 !important;
+}
+
+.ant-btn-link {
+  color: #bc0978 !important;
+  text-decoration: underline;
+}

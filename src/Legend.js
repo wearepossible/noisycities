@@ -13,7 +13,7 @@ const legendStyle = {
   padding: 5,
   overflow: 'hidden',
   width: 250,
-  height: 280,
+  height: 250,
   boxShadow: '2px 2px 4px #ccc',
   left: 20,
   bottom: 45,
@@ -22,11 +22,11 @@ const legendStyle = {
 };
 
 
-function Legend({ value, muted, setMuted }) {
+function Legend({ value, muted, setMuted, language }) {
   return (
     <div style={legendStyle}>
       <GaugeChart value={value} />
-      <div style={{ textAlign: 'center', fontSize: 12 }}>ANNUAL AVERAGE<br/> NOISE INTENSITY (dB)</div>
+      <div style={{ textAlign: 'center', fontSize: 12 }}>{language === 'fr'? 'INTENSITÉ DU BRUIT (dB)' : 'NOISE INTENSITY (dB)'}</div>
       <div style={{ textAlign: 'center', position: 'absolute', top: 130, width: '100%', marginLeft: -5 }}>
         <Tooltip title={muted ? 'Unmute' : 'Mute'} placement="bottom">
           <Button style={{ opacity: muted ? 0.3 : 1 }} type={muted ? 'dashed' : 'default'} shape="circle" icon={<SoundOutlined />} onClick={() => setMuted(!muted)} />

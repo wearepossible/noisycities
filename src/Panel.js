@@ -1,32 +1,35 @@
 import React from "react"
 
 import logo from './assets/Jetpack-small.png'
-import possibleLogo from './assets/Possible_Logo_WebsiteLogo.jpeg'
+import possibleLogo from './assets/possible.png'
+import carFreeLogo from './assets/carFree.png'
 import { Row, Tabs } from 'antd'
 
-function Panel({setCity, city, intro, sources}) {
+function Panel({setCity, city, intro1, intro2, sources, outro, language}) {
   return (
     <div>
-      <img src={possibleLogo} alt="possible logo" style={{width: '100%'}} />
-      <h1 style={{ textAlign: 'center', fontWeight: 'bold', color: '#bc0978'}}>Inspiring climate action</h1>
-      {intro}
-      {sources}
-      <Row style={{ fontFamily: 'Poppins, sans-serif', textShadow: 'none'}} align="middle">
-        <div style={{ marginRight: 32, fontSize: 16 }}>Pick a city: </div>
-        <Tabs onChange={setCity} activeKey={city}>
-          <Tabs.TabPane tab="Paris" key="paris" />
-          <Tabs.TabPane tab="Brussels" key="bxl" />
-          <Tabs.TabPane tab="New-York City" key="nyc" />
-          <Tabs.TabPane tab="London" key="london" />
+      <a href="https://www.carfreemegacities.org" target="_blank" rel="noopener noreferrer"> 
+        <img src={carFreeLogo} alt="Car Free Megacities logo" style={{width: '100%'}} />
+      </a>
+      {intro1}
+      <Row type="flex">
+        <Tabs onChange={setCity} activeKey={city} centered style={{width: '100%'}}>
+          <Tabs.TabPane tab={'Paris'} key="paris" />
+          <Tabs.TabPane tab="New York" key="nyc" />
+          <Tabs.TabPane tab={language === 'fr' ? 'Londres' : 'London'} key="london" />
         </Tabs>
-        {/* <div>Audible data visualization on Brussels noise pollution.</div> */}
-        {/* <div>Crank up the volume and mouse over the city.</div> */}
       </Row>
+      {intro2}
+      {sources}
 
-      <div style={{ marginTop: 100 }}>
-        <div style={{ textAlign: 'center'}} > Designed by
-          <span style={{ textAlign: 'center', marginTop: 8}}><a href="https://www.jetpack.ai" target="_blank" rel="noopener noreferrer"> <img alt="map" style={{marginLeft: 8, marginRight: 8, width: 120}} src={logo}/></a></span>
+      <div>
+        <div style={{ textAlign: 'center'}} >
+          <span style={{ textAlign: 'center', marginTop: 8}}><a href="https://www.wearepossible.org/" target="_blank" rel="noopener noreferrer"> <img alt="possible logo" style={{marginLeft: 8, marginRight: 8, width: '60%'}} src={possibleLogo}/></a></span>
         </div>
+        <div style={{ textAlign: 'center', marginTop: 16 }} > Designed by
+          <span style={{ textAlign: 'center', marginTop: 8}}><a href="https://www.jetpack.ai" target="_blank" rel="noopener noreferrer"> <img alt="jetpack logo" style={{marginLeft: 8, marginRight: 8, width: 120}} src={logo}/></a></span>
+        </div>
+        <div style={{ fontSize: 10, marginTop: 8, marginBottom: 32 }}>{outro}</div>
       </div>
     </div>
   )

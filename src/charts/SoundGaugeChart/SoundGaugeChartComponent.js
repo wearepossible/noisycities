@@ -24,7 +24,7 @@ class SoundGaugeChartComponent extends Component {
     window.addEventListener('resize', this.createChart);
   }
 
-  componentWillReceiveProps(nextProps){
+  UNSAFE_componentWillReceiveProps(nextProps){
     var currentState = this.getChartState(nextProps);
     if(this.state.chart){
       this.state.chart.update(currentState);

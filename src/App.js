@@ -17,10 +17,45 @@ import Tooltip from './Tooltip';
 import Legend from './Legend'
 import './App.css';
 import Panel from './Panel'
+import 'mapbox-gl/dist/mapbox-gl.css';
+import {
+  TwitterShareButton,
+  FacebookShareButton,
+  LinkedinShareButton,
+  FacebookIcon,
+  LinkedinIcon,
+  TwitterIcon,
+} from "react-share";
 
 // Set your mapbox access token here
 const MAPBOX_ACCESS_TOKEN = 'pk.eyJ1IjoicGZjcm91c3NlIiwiYSI6ImNreWtycmJxOTI0dWUzMHFwOTNtdjk1OGUifQ.vaI6qrvOwkqWe5k8JhNYdg';
 const MAPBOX_STYLE = 'mapbox://styles/pfcrousse/ckymrthcs8bs614qpadigs2os'
+
+const shareUrl = 'https://www.carfreemegacities.org/noise-pollution'
+const shareText = 'Noisy Cities. Noise maps show the levels of exposure to noise in London, Paris and New York. Use your mouse to explore the loudest and quietest spots in our Car Free Megacities.'
+const shareTextFr = 'Ces cartes du bruit montrent le niveau de la pollution sonore dans les villes de Londres, Paris et New York. Utilisez votre souris pour explorer les coins les plus calmes ainsi que les plus bruyants de ces mégalopoles.'
+const intro1En = <div>
+  <p>Our noise maps show the levels of exposure to noise in London, Paris and New York. Use your mouse to explore the loudest and quietest spots. We’ve created this to help people learn more about noise pollution in these megacities.</p>
+  <p>Remember: decibels are not a linear scale. Instead, we experience an increase of 10 decibels as a doubling of loudness. For example, 80 decibels is four times louder than 60 decibels.</p>
+  <p>You can zoom in to get more detail about a particular city, and you can click on the buttons below to jump to different cities.</p>
+</div>
+const intro1Fr = <div>
+  <p>Notre carte du bruit montre le niveau d'exposition au bruit dans les villes de Londres, Paris et New York. Utilisez votre souris pour explorer les coins les plus calmes ainsi que les plus bruyants. Ce travail a été conçu dans le but de rendre perceptible la pollution sonore dans ces mégapoles.</p>
+  <p>Il est à noter que les décibels ne suivent pas une échelle linéaire. Une augmentation de 10 décibels est ressenti comme un doublement du volume. Par exemple, 80 décibels est quatre fois plus fort que 60 décibels.</p>
+  <p>Zoomez sur la carte pour obtenir plus de détails sur une ville. Cliquez sur les boutons ci-dessous pour accéder aux autres villes.</p>
+</div>
+const intro2En = <div>
+  <p>Like what you see? Share it on: <TwitterShareButton url={shareUrl} title={shareText}><TwitterIcon size={32} round={true} /></TwitterShareButton> <FacebookShareButton url={shareUrl} quote={shareText}><FacebookIcon size={32} round={true} /></FacebookShareButton> <LinkedinShareButton url={shareUrl} title={shareText}><LinkedinIcon size={32} round={true} /></LinkedinShareButton> </p>
+  <p>Want more like this? Sign up to our <a href="https://www.carfreemegacities.org/noise-pollution" target="_blank" rel="noopener noreferrer"> mailing list</a>.</p>
+</div>
+const intro2Fr = <div>
+{/* <p>Like what you see? Share it on: <TwitterShareButton url={shareUrl} title={shareText}><TwitterIcon size={32} round={true} /></TwitterShareButton> <FacebookShareButton url={shareUrl} quote={shareText}><FacebookIcon size={32} round={true} /></FacebookShareButton> <LinkedinShareButton url={shareUrl} title={shareText}><LinkedinIcon size={32} round={true} /></LinkedinShareButton> </p> */}
+<p>Appréciez-vous ce contenu? Partagez le sur: <TwitterShareButton url={shareUrl} title={shareTextFr}><TwitterIcon size={32} round={true} /></TwitterShareButton> <FacebookShareButton url={shareUrl} quote={shareTextFr}><FacebookIcon size={32} round={true} /></FacebookShareButton> <LinkedinShareButton url={shareUrl} title={shareTextFr}><LinkedinIcon size={32} round={true} /></LinkedinShareButton> </p>
+<p>Vous en voulez plus? Abonnez vous à notre <a href="https://www.carfreemegacities.org/noise-pollution" target="_blank" rel="noopener noreferrer"> newsletter</a>.</p>
+</div>
+
+const outroEn = <p style={{textAlign: 'center'}}>These sonifications build on <br/> <a href="https://noisy-city.jetpack.ai/" target="_blank" rel="noopener noreferrer">Karim Douieb's original Noisy City map of Brussels</a>.</p>
+const outroFr = <p style={{textAlign: 'center'}}>Cette représentation auditive des données est construite sur base du travail de <a href="https://noisy-city.jetpack.ai/" target="_blank" rel="noopener noreferrer">Karim Douieb avec sa carte du bruit de Brussels</a>.</p>
 
 const locations = {
   paris: {
@@ -28,42 +63,42 @@ const locations = {
     latitude: 48.851, 
     zoom: 10.2, 
     bbox: [[2.0943827204,48.7117011393],[2.6588734805,49.035891562]],
-    intro: <div>
-      <h3>Noisy cities</h3>
-      <p>Here is the description of this project for Paris.</p>
+    sourcesFr: <div>
+      <p><span style={{fontWeight: 'bold'}}>Sources des données</span>: <a href="https://carto.bruitparif.fr/" target="_blank" rel="noopener noreferrer">Bruitparif</a>. Les données sont extraites depuis les stations <a href="https://rumeur.bruitparif.fr/main" target="_blank" rel="noopener noreferrer">Rumeur network</a>. Les mesures intermédiaires sont extrapolées et validées avec les données collectées. <a href="https://www.bruitparif.fr/pages/En-tete/700%20Accompagner/800%20CSB%20en%20IdF/680%20Une%20m%C3%A9thodologie%20rigoureuse/2018-08-21%20-%20M%C3%A9thologie%20d'%C3%A9laboration%20des%20cartes%20strat%C3%A9giques%20de%20bruit%20de%203%C3%A8me%20%C3%A9ch%C3%A9ance%20(2017)%20en%20%C3%8Ele-de-France.pdf" target="_blank" rel="noopener noreferrer">Information sur la méthodologie</a></p>
+      <p>Il s'agit de la troisième itération (cycle de 5 années) de récolte de données imposée par la directive européenne sur le bruit environnemental. Les données sont du type ‘Lden’ (24 heures 7/7, jour et soir), le niveau de bruit moyen concerne le trafic routier seulement (ce qui explique les zones de faible bruit aux alentours des gares et des aéroports).</p>
     </div>,
-    sources: <div>
-      <h3>Sources</h3>
-      <p>Here are the sources and references</p>
-    </div>
+    sourcesEn: <div>
+      <p><span style={{fontWeight: 'bold'}}>Data sources</span>: <a href="https://carto.bruitparif.fr/" target="_blank" rel="noopener noreferrer">Bruitparif</a>. Data is taken from monitoring stations on the <a href="https://rumeur.bruitparif.fr/main" target="_blank" rel="noopener noreferrer">Rumeur network</a> and intermediate points are modelled and validated against the collected data, including the effects of average weather conditions on noise levels.  <a href="https://www.bruitparif.fr/pages/En-tete/700%20Accompagner/800%20CSB%20en%20IdF/680%20Une%20m%C3%A9thodologie%20rigoureuse/2018-08-21%20-%20M%C3%A9thologie%20d'%C3%A9laboration%20des%20cartes%20strat%C3%A9giques%20de%20bruit%20de%203%C3%A8me%20%C3%A9ch%C3%A9ance%20(2017)%20en%20%C3%8Ele-de-France.pdf" target="_blank" rel="noopener noreferrer">Methodological information (in French).</a></p>
+      <p>Data are under the third five year cycle of EU Environmental Noise Directive reporting. Data is ‘Lden’ (24 hour - day, evening and night) average noise levels for road traffic noise only (hence low levels can be seen on the maps close to railway stations and airports).</p>
+    </div>,
   },
   london: {
     longitude: -0.048, 
     latitude: 51.491, 
     zoom: 10, 
     bbox: [[-0.5945770815,51.2468407724],[0.3375120088,51.7292587128]],
-    intro: <div>
-      <h3>Noisy cities</h3>
-      <p>Here is the description of this project for London.</p>
-    </div>,
-    sources: <div>
-      <h3>Sources</h3>
-      <p>Here are the sources and references</p>
-    </div>
+    sourcesEn: <div>
+      <p><span style={{fontWeight: 'bold'}}>Data Sources</span>: <a href="https://environment.data.gov.uk/dataset/fd1c6327-ad77-42ae-a761-7c6a0866523d" target="_blank" rel="noopener noreferrer">DEFRA (Department for Environment, Transport and Rural Affairs)</a>. Data is entirely modelled and not directly from any monitoring stations. The London data only shows main roads as the UK only carries out the minimum mapping required under the EU Environmental Noise Directive.
+      <a href="https://www.gov.uk/government/publications/strategic-noise-mapping-2019" target="_blank" rel="noopener noreferrer"> More information.</a></p>
+      <p>Data are under the third five year cycle of EU Environmental Noise Directive reporting. Data is ‘Lden’ (24 hour - day, evening and night) average noise levels for road traffic noise only (hence low levels can be seen on the maps close to railway stations and airports).</p>
+    </div>,  
+    sourcesFr: <div>
+      <p><span style={{fontWeight: 'bold'}}>Sources des données</span>: <a href="https://environment.data.gov.uk/dataset/fd1c6327-ad77-42ae-a761-7c6a0866523d" target="_blank" rel="noopener noreferrer">DEFRA (Department for Environment, Transport and Rural Affairs)</a>. Les données sont entièrement modélisées sans l'aide de collecte directe depuis des stations de monitoring. Les données sur Londres ne concernent que les routes principales, correspondant au minimum requis par la directive de l'UE sur le bruit dans l'environnement.
+      <a href="https://www.gov.uk/government/publications/strategic-noise-mapping-2019" target="_blank" rel="noopener noreferrer"> Plus d'information ici.</a></p>
+      <p>Il s'agit de la troisième itération (cycle de 5 années) de récolte de données imposée par la directive européenne sur le bruit dans l'environnement. Les données sont du type ‘Lden’ (24 heures 7/7, jour et soir), le niveau de bruit moyen concerne le trafic routier seulement (ce qui explique les zones de faible bruit aux alentours des gares et des aéroports).</p>
+    </div>,  
   },
   nyc: {
     longitude: -73.917, 
     latitude: 40.710, 
     zoom: 10, 
     bbox: [[-74.2740753571,40.4853136705],[-73.8192439591,40.8276099713]],
-    intro: <div>
-      <h3>Noisy cities</h3>
-      <p>Here is the description of this project for NYC.</p>
+    sourcesEn: <div>
+      <p><span style={{fontWeight: 'bold'}}>Data Sources</span>: <a href="https://maps.dot.gov/BTS/NationalTransportationNoiseMap/" target="_blank" rel="noopener noreferrer">US DOT National Transportation Noise map</a>. The New York map includes both road traffic and aircraft noise, and assumes road traffic is evenly distributed through the day. <a href="https://www.bts.gov/sites/bts.dot.gov/files/docs/explore-topics-and-geography/geography/203606/btsnoisemappingtooldocumentationmarch2016.pdf" target="_blank" rel="noopener noreferrer">Methodological information</a></p>
     </div>,
-    sources: <div>
-      <h3>Sources</h3>
-      <p>Here are the sources and references</p>
-    </div>
+    sourcesFr: <div>
+    <p><span style={{fontWeight: 'bold'}}>Sources des données</span>: <a href="https://maps.dot.gov/BTS/NationalTransportationNoiseMap/" target="_blank" rel="noopener noreferrer">US DOT National Transportation Noise map</a>. La carte de New York, à la différence des autres villes, inclus à la fois le traffic aérien et routier, elle assume également que le traffic est uniformément distribué au cours de la journée. <a href="https://www.bts.gov/sites/bts.dot.gov/files/docs/explore-topics-and-geography/geography/203606/btsnoisemappingtooldocumentationmarch2016.pdf" target="_blank" rel="noopener noreferrer">Information sur la méthodologie.</a></p>
+  </div>
   },
   bxl: {
     longitude: 4.3549, 
@@ -181,6 +216,9 @@ function App() {
   const [openDrawer, setOpenDrawer] = useState(true)
   const [layers] = useState(null)
   const [city, setCity] = useState(url.get('city') || 'paris')
+  const userLang = navigator.language || navigator.userLanguage; 
+  const languageCode = userLang && userLang.startsWith('fr') ? 'fr' : 'en';
+  const [language, setLanguage] = useState(url.get('language') && ['fr', 'en'].includes(url.get('language')) ? url.get('language') : languageCode)
   const [viewState, setViewState] = useState(INITIAL_VIEW_STATE);
 
   useEffect(() => {
@@ -195,10 +233,10 @@ function App() {
         //transitionInterpolator: new FlyToInterpolator(),
       }
       setViewState(newViewState)
-      navigate('/?city='+city, { replace: true })
+      navigate(`/?city=${city}&language=${language}`, { replace: true })
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [city]);
+  }, [city, language]);
 
   const onViewStateChange = ({viewState}) => {
     viewState.longitude = Math.min(locations[city].bbox[1][0], Math.max(locations[city].bbox[0][0], viewState.longitude));
@@ -282,8 +320,16 @@ function App() {
   return (
     <div>
       <Row style={{ position: 'relative', width: '100vw', overflow: 'hidden' }}>
-        <Col span={width < 900 ? 24 : 6} style={{ padding: 16, height: '100vh' }}>
-          <Panel setCity={setCity} city={city} intro={locations[city].intro} sources={locations[city].sources}/>
+        <Col span={width < 900 ? 24 : 6} style={{ padding: 16, height: width < 900 ? '' : '100vh', overflowY: width < 900 ? '' : 'scroll' }}>
+          <Row justify="end" style={{ marginBottom: -35 }}>
+            <Button type="link" onClick={() => setLanguage('en')}><span style={{ marginRight: -12, textDecoration: language === 'en' ? 'underline' : 'none', color: language !== 'en' ? 'grey' : ''}}>EN</span></Button> 
+            <Button type="link" onClick={() => setLanguage('fr')}><span style={{ textDecoration: language === 'fr' ? 'underline' : 'none', color: language !== 'fr' ? 'grey' : ''}}>FR</span></Button>
+          </Row>
+          <Panel setCity={setCity} city={city} language={language}
+            intro1={language === 'fr' ? intro1Fr : intro1En} 
+            intro2={language === 'fr' ? intro2Fr : intro2En} 
+            sources={language === 'fr' ? locations[city].sourcesFr: locations[city].sourcesEn} 
+            outro={language === 'fr' ? outroFr: outroEn}/>
         </Col>
         <Col span={width < 900 ? 24 : 18} style={{ height: width < 900 ? '90vh' : '100vh'}}>
           <DeckGL
@@ -322,7 +368,7 @@ function App() {
             />
           </div>
           <div style={{ position: "absolute", right: 10, bottom: 0, width: 300 }}>
-            <Legend muted={muted} setMuted={setMuted} value={tooltip && tooltip.value}/>
+            <Legend muted={muted} setMuted={setMuted} value={tooltip && tooltip.value} language={language}/>
           </div>
         </DeckGL>
         {/* <div style={{ position: "absolute", left: '5vw', top: '5vh', width: '100vw', pointerEvents: 'none', textShadow: '-1px -1px 0 white, 1px -1px 0 white, -1px 1px 0 white, 1px 1px 0 white'}}>
