@@ -2,6 +2,7 @@
   "name": "bxl-noise",
   "version": "0.1.0",
   "private": true,
+  "homepage": "/noisycities/",
   "dependencies": {
     "@react-hook/window-size": "^3.0.7",
     "@testing-library/jest-dom": "^4.2.4",
