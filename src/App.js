@@ -32,25 +32,23 @@ const MAPBOX_ACCESS_TOKEN = 'pk.eyJ1IjoicGZjcm91c3NlIiwiYSI6ImNreWtycmJxOTI0dWUz
 const MAPBOX_STYLE = 'mapbox://styles/pfcrousse/ckymrthcs8bs614qpadigs2os'
 
 const shareUrl = 'https://www.carfreemegacities.org/noise-pollution'
-const shareText = 'Noisy Cities. Noise maps show the levels of exposure to noise in London, Paris and New York. Use your mouse to explore the loudest and quietest spots in our Car Free Megacities.'
-const shareTextFr = 'Ces cartes du bruit montrent le niveau de la pollution sonore dans les villes de Londres, Paris et New York. Utilisez votre souris pour explorer les coins les plus calmes ainsi que les plus bruyants de ces mégalopoles.'
+const shareText = `Noise pollution is the second biggest environmental threat in Europe. 
+Don't cover your ears. Find out just how noisy our cities are with our new interactive map 👇`
+const shareTextFr = `La pollution sonore est la deuxième plus grande menace environnementale en Europe.
+Ne couvrez pas vos oreilles. Découvrez à quel point nos villes sont bruyantes grâce à notre carte interactive 👇`
 const intro1En = <div>
-  <p>Our noise maps show the levels of exposure to noise in London, Paris and New York. Use your mouse to explore the loudest and quietest spots. We’ve created this to help people learn more about noise pollution in these megacities.</p>
-  <p>Remember: decibels are not a linear scale. Instead, we experience an increase of 10 decibels as a doubling of loudness. For example, 80 decibels is four times louder than 60 decibels.</p>
-  <p>You can zoom in to get more detail about a particular city, and you can click on the buttons below to jump to different cities.</p>
+  <p>Our noise maps show the levels of exposure to noise in London, Paris and New York. <br/>Use your mouse to explore the loudest and quietest spots. <br/>We’ve created this to help people learn more about noise pollution in these megacities.</p>
 </div>
 const intro1Fr = <div>
-  <p>Notre carte du bruit montre le niveau d'exposition au bruit dans les villes de Londres, Paris et New York. Utilisez votre souris pour explorer les coins les plus calmes ainsi que les plus bruyants. Ce travail a été conçu dans le but de rendre perceptible la pollution sonore dans ces mégapoles.</p>
-  <p>Il est à noter que les décibels ne suivent pas une échelle linéaire. Une augmentation de 10 décibels est ressenti comme un doublement du volume. Par exemple, 80 décibels est quatre fois plus fort que 60 décibels.</p>
-  <p>Zoomez sur la carte pour obtenir plus de détails sur une ville. Cliquez sur les boutons ci-dessous pour accéder aux autres villes.</p>
+  <p>Notre carte du bruit montre le niveau d'exposition au bruit dans les villes de Londres, Paris et New York. <br/>Utilisez votre souris pour explorer les coins les plus calmes ainsi que les plus bruyants. <br/>Ce travail a été conçu dans le but de rendre perceptible la pollution sonore dans ces mégapoles.</p>
 </div>
 const intro2En = <div>
-  <p>Like what you see? Share it on: <TwitterShareButton url={shareUrl} title={shareText}><TwitterIcon size={32} round={true} /></TwitterShareButton> <FacebookShareButton url={shareUrl} quote={shareText}><FacebookIcon size={32} round={true} /></FacebookShareButton> <LinkedinShareButton url={shareUrl} title={shareText}><LinkedinIcon size={32} round={true} /></LinkedinShareButton> </p>
+  <div>Like what you see? <br/><Row align="top"><span style={{marginRight: 8 }}>Share it on: </span> <TwitterShareButton url={shareUrl} title={shareText + ' via @_wearepossible'}><TwitterIcon size={32} round={true} /></TwitterShareButton> <FacebookShareButton url={shareUrl} quote={shareText + ' via @wearepossibleuk'}><FacebookIcon size={32} round={true} /></FacebookShareButton> <LinkedinShareButton url={shareUrl} title={shareText + ' via https://www.linkedin.com/company/wearepossible/'}><LinkedinIcon size={32} round={true} /></LinkedinShareButton> </Row></div>
   <p>Want more like this? Sign up to our <a href="https://www.carfreemegacities.org/noise-pollution" target="_blank" rel="noopener noreferrer"> mailing list</a>.</p>
 </div>
 const intro2Fr = <div>
 {/* <p>Like what you see? Share it on: <TwitterShareButton url={shareUrl} title={shareText}><TwitterIcon size={32} round={true} /></TwitterShareButton> <FacebookShareButton url={shareUrl} quote={shareText}><FacebookIcon size={32} round={true} /></FacebookShareButton> <LinkedinShareButton url={shareUrl} title={shareText}><LinkedinIcon size={32} round={true} /></LinkedinShareButton> </p> */}
-<p>Appréciez-vous ce contenu? Partagez le sur: <TwitterShareButton url={shareUrl} title={shareTextFr}><TwitterIcon size={32} round={true} /></TwitterShareButton> <FacebookShareButton url={shareUrl} quote={shareTextFr}><FacebookIcon size={32} round={true} /></FacebookShareButton> <LinkedinShareButton url={shareUrl} title={shareTextFr}><LinkedinIcon size={32} round={true} /></LinkedinShareButton> </p>
+<div>Appréciez-vous ce contenu? <br/><Row align="top"><span style={{marginRight: 8 }}>Partagez le sur:</span> <TwitterShareButton url={shareUrl} title={shareTextFr + ' via @_wearepossible'}><TwitterIcon size={32} round={true} /></TwitterShareButton> <FacebookShareButton url={shareUrl} quote={shareTextFr + ' via @wearepossibleuk'}><FacebookIcon size={32} round={true} /></FacebookShareButton> <LinkedinShareButton url={shareUrl} title={shareTextFr  + ' via https://www.linkedin.com/company/wearepossible/'}><LinkedinIcon size={32} round={true} /></LinkedinShareButton></Row> </div>
 <p>Vous en voulez plus? Abonnez vous à notre <a href="https://www.carfreemegacities.org/noise-pollution" target="_blank" rel="noopener noreferrer"> newsletter</a>.</p>
 </div>
 
@@ -64,10 +62,14 @@ const locations = {
     zoom: 10.2, 
     bbox: [[2.0943827204,48.7117011393],[2.6588734805,49.035891562]],
     sourcesFr: <div>
+      <p>Il est à noter que les décibels ne suivent pas une échelle linéaire. Une augmentation de 10 décibels est ressenti comme un doublement du volume. Par exemple, 80 décibels est quatre fois plus fort que 60 décibels.</p>
+      {/* <p>Zoomez sur la carte pour obtenir plus de détails sur une ville. Cliquez sur les boutons ci-dessous pour accéder aux autres villes.</p> */}
       <p><span style={{fontWeight: 'bold'}}>Sources des données</span>: <a href="https://carto.bruitparif.fr/" target="_blank" rel="noopener noreferrer">Bruitparif</a>. Les données sont extraites depuis les stations <a href="https://rumeur.bruitparif.fr/main" target="_blank" rel="noopener noreferrer">Rumeur network</a>. Les mesures intermédiaires sont extrapolées et validées avec les données collectées. <a href="https://www.bruitparif.fr/pages/En-tete/700%20Accompagner/800%20CSB%20en%20IdF/680%20Une%20m%C3%A9thodologie%20rigoureuse/2018-08-21%20-%20M%C3%A9thologie%20d'%C3%A9laboration%20des%20cartes%20strat%C3%A9giques%20de%20bruit%20de%203%C3%A8me%20%C3%A9ch%C3%A9ance%20(2017)%20en%20%C3%8Ele-de-France.pdf" target="_blank" rel="noopener noreferrer">Information sur la méthodologie</a></p>
       <p>Il s'agit de la troisième itération (cycle de 5 années) de récolte de données imposée par la directive européenne sur le bruit environnemental. Les données sont du type ‘Lden’ (24 heures 7/7, jour et soir), le niveau de bruit moyen concerne le trafic routier seulement (ce qui explique les zones de faible bruit aux alentours des gares et des aéroports).</p>
     </div>,
     sourcesEn: <div>
+      <p>Remember: decibels are not a linear scale. Instead, we experience an increase of 10 decibels as a doubling of loudness. For example, 80 decibels is four times louder than 60 decibels.</p>
+      {/* <p>You can zoom in to get more detail about a particular city, and you can click on the buttons below to jump to different cities.</p> */}
       <p><span style={{fontWeight: 'bold'}}>Data sources</span>: <a href="https://carto.bruitparif.fr/" target="_blank" rel="noopener noreferrer">Bruitparif</a>. Data is taken from monitoring stations on the <a href="https://rumeur.bruitparif.fr/main" target="_blank" rel="noopener noreferrer">Rumeur network</a> and intermediate points are modelled and validated against the collected data, including the effects of average weather conditions on noise levels.  <a href="https://www.bruitparif.fr/pages/En-tete/700%20Accompagner/800%20CSB%20en%20IdF/680%20Une%20m%C3%A9thodologie%20rigoureuse/2018-08-21%20-%20M%C3%A9thologie%20d'%C3%A9laboration%20des%20cartes%20strat%C3%A9giques%20de%20bruit%20de%203%C3%A8me%20%C3%A9ch%C3%A9ance%20(2017)%20en%20%C3%8Ele-de-France.pdf" target="_blank" rel="noopener noreferrer">Methodological information (in French).</a></p>
       <p>Data are under the third five year cycle of EU Environmental Noise Directive reporting. Data is ‘Lden’ (24 hour - day, evening and night) average noise levels for road traffic noise only (hence low levels can be seen on the maps close to railway stations and airports).</p>
     </div>,
@@ -326,6 +328,7 @@ function App() {
             <Button type="link" onClick={() => setLanguage('fr')}><span style={{ textDecoration: language === 'fr' ? 'underline' : 'none', color: language !== 'fr' ? 'grey' : ''}}>FR</span></Button>
           </Row>
           <Panel setCity={setCity} city={city} language={language}
+            part={width < 900 ? 1 : null}
             intro1={language === 'fr' ? intro1Fr : intro1En} 
             intro2={language === 'fr' ? intro2Fr : intro2En} 
             sources={language === 'fr' ? locations[city].sourcesFr: locations[city].sourcesEn} 
@@ -379,12 +382,22 @@ function App() {
           </div>
         </div> */}
         </Col>
+        { width < 900 && <Col span={24} style={{ padding: 16 }}>
+            <Panel setCity={setCity} city={city} language={language}
+              part={2}
+              intro1={language === 'fr' ? intro1Fr : intro1En} 
+              intro2={language === 'fr' ? intro2Fr : intro2En} 
+              sources={language === 'fr' ? locations[city].sourcesFr: locations[city].sourcesEn} 
+              outro={language === 'fr' ? outroFr: outroEn}/>
+          </Col>
+        }
       </Row>
       <Drawer
           title="Volume On"
           placement="bottom"
           closable={false}
           visible={openDrawer}
+          height={350}
         >
           <p>This data visualization is an experiment aiming at making you feel and hear the noise pollution in various cities.</p>
           <p>If you want to experience the sound just crank your volume up and click on the "With sound" button.</p>
