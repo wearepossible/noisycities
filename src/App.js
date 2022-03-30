@@ -33,7 +33,7 @@ const MAPBOX_STYLE = 'mapbox://styles/pfcrousse/ckymrthcs8bs614qpadigs2os'
 
 const shareUrl = 'https://www.carfreemegacities.org/noise-pollution'
 const shareText = `Noise pollution is the second biggest environmental threat in Europe. 
-Don't cover your ears. Find out just how noisy our cities are with our new interactive map 👇`
+Don't cover your ears. Find out just how noisy our cities are with this new interactive map 👇`
 const shareTextFr = `La pollution sonore est la deuxième plus grande menace environnementale en Europe.
 Ne couvrez pas vos oreilles. Découvrez à quel point nos villes sont bruyantes grâce à notre carte interactive 👇`
 const intro1En = <div>
