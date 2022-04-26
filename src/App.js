@@ -32,9 +32,9 @@ const MAPBOX_ACCESS_TOKEN = 'pk.eyJ1IjoicGZjcm91c3NlIiwiYSI6ImNreWtycmJxOTI0dWUz
 const MAPBOX_STYLE = 'mapbox://styles/pfcrousse/ckymrthcs8bs614qpadigs2os'
 
 const shareUrl = 'https://www.carfreemegacities.org/noise-pollution'
-const shareText = `Noise pollution is the second biggest environmental threat in Europe. 
+const shareText = `Noise pollution is one of the biggest threats to environmental health in Europe. 
 Don't cover your ears. Find out just how noisy our cities are with this new interactive map 👇`
-const shareTextFr = `La pollution sonore est la deuxième plus grande menace environnementale en Europe.
+const shareTextFr = `LLa pollution sonore est l'une des plus grandes menaces pour la santé environnementale en Europe.
 Ne couvrez pas vos oreilles. Découvrez à quel point nos villes sont bruyantes grâce à cette carte interactive 👇`
 const intro1En = <div>
   <p>Our noise maps show the levels of exposure to noise in London, Paris and New York.</p> <p>Use your mouse to explore the loudest and quietest spots.</p> <p>We’ve created this to help people learn more about noise pollution in these megacities.</p>
