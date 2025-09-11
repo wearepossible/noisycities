@@ -15,11 +15,17 @@ function Panel({setCity, city, part, intro1, intro2, sources, outro, language}) 
           </a>
           {intro1}
           <Row type="flex">
-            <Tabs onChange={setCity} activeKey={city} centered style={{width: '100%'}}>
-              <Tabs.TabPane tab={'Paris'} key="paris" />
-              <Tabs.TabPane tab="New York" key="nyc" />
-              <Tabs.TabPane tab={language === 'fr' ? 'Londres' : 'London'} key="london" />
-            </Tabs>
+            <Tabs
+              onChange={setCity}
+              activeKey={city}
+              centered
+              style={{width: '100%'}}
+              items={[
+                { label: 'Paris', key: 'paris' },
+                { label: 'New York', key: 'nyc' },
+                { label: language === 'fr' ? 'Londres' : 'London', key: 'london' }
+              ]}
+            />
           </Row>
           {intro2}
         </div>

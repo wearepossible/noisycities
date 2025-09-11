@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { DeckGL } from 'deck.gl';
 //import { ScatterplotLayer } from '@deck.gl/layers';
 import { useNavigate, useLocation } from "react-router-dom";
-import ReactMapGL, { NavigationControl, _MapContext as MapContext } from "react-map-gl";
+import { Map, NavigationControl } from "react-map-gl";
 import nearestColor from 'nearest-color';
 import ReactAudioPlayer from 'react-audio-player'
 import * as d3 from 'd3';
@@ -345,23 +345,19 @@ function App() {
             initialViewState={viewState}
             onHover={onMouseMove}
             getCursor={() => "crosshair"}
-            ContextProvider={MapContext.Provider}
             onDragStart={() => setTooltip({ ...tooltip, x: -1000, y: -1000 })}
             onViewStateChange={onViewStateChange}
           >
-            <ReactMapGL
-              reuseMaps
-              mapboxApiAccessToken={MAPBOX_ACCESS_TOKEN}
-              preventStyleDiffing
+            <Map
+              initialViewState={viewState}
+              mapboxAccessToken={MAPBOX_ACCESS_TOKEN}
               mapStyle={MAPBOX_STYLE}
               ref={map => { mapRef = map }}
               preserveDrawingBuffer={true}
             >
-            </ReactMapGL>
+              <NavigationControl position="top-left" />
+            </Map>
             <Tooltip data={tooltip} />
-            <div style={{ position: "absolute", right: 30, top: 30 }}>
-              <NavigationControl />
-            </div>
             <div>
               <ReactAudioPlayer
                 id="noise-audio"
@@ -400,7 +396,7 @@ function App() {
         title="Volume On"
         placement="bottom"
         closable={false}
-        visible={openDrawer}
+        open={openDrawer}
         height={350}
       >
         <p>This data visualization is an experiment aiming at making you feel and hear the noise pollution in various cities.</p>

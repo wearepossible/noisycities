@@ -1,5 +1,4 @@
-import React, {Component} from 'react';
-import ReactDOM from 'react-dom';
+import React, {Component, createRef} from 'react';
 import SoundGaugeChart from './SoundGaugeChart.js';
 
 class SoundGaugeChartComponent extends Component {
@@ -7,7 +6,7 @@ class SoundGaugeChartComponent extends Component {
   constructor(props) {
     super(props);
     this.state = this.getInitialState();
-
+    this.chartRef = createRef();
     this.createChart = this.createChart.bind(this);
   }
 
@@ -32,7 +31,7 @@ class SoundGaugeChartComponent extends Component {
   }
 
   createChart() {
-    const el = ReactDOM.findDOMNode(this.refs.chart);
+    const el = this.chartRef.current;
 
     if (this.state.chart) {
       this.state.chart.destroy();
@@ -79,7 +78,7 @@ class SoundGaugeChartComponent extends Component {
 
   render() {
     return (
-      <div ref='chart'></div>
+      <div ref={this.chartRef}></div>
     );
   }
 };
