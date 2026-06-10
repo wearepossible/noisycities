@@ -1,3 +1,8 @@
 [build]
   command = "npm run build"
   publish = "build"
+
+[build.environment]
+  # Vite 6 requires a modern Node.js; pin to the current LTS so Netlify
+  # doesn't fall back to an older default that breaks the build.
+  NODE_VERSION = "20"
