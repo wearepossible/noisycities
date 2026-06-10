@@ -1,0 +1,12 @@
+version: 2
+updates:
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    # Batch all npm updates into a single consolidated PR per week instead of
+    # opening a separate PR for every package — keeps the noise down.
+    groups:
+      npm-dependencies:
+        patterns:
+          - "*"
