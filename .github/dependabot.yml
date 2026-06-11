@@ -4,9 +4,14 @@ updates:
     directory: "/"
     schedule:
       interval: "weekly"
-    # Batch all npm updates into a single consolidated PR per week instead of
-    # opening a separate PR for every package — keeps the noise down.
     groups:
+      # Batch only the safe, non-breaking updates (minor + patch) into a single
+      # consolidated PR per week. Major updates are deliberately excluded from
+      # the group so they arrive as separate, individual PRs that can be
+      # reviewed and tested one at a time rather than merged in bulk.
       npm-dependencies:
         patterns:
           - "*"
+        update-types:
+          - "minor"
+          - "patch"
