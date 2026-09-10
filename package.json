@@ -6,7 +6,7 @@
   "scripts": {
     "build": "./build.sh",
     "dev": "./build.sh && python3 -m http.server -d build 8000",
-    "test": "node test/gauge-geometry.cjs"
+    "test": "node test/gauge-geometry.cjs && node test/colour-parity.cjs && node test/hover-pipeline.cjs"
   },
   "dependencies": {
     "mapbox-gl": "^3.24.1"
