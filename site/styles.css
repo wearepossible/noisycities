@@ -152,12 +152,14 @@ html.no-js .panel-sources > [data-city]:not([data-city="paris"]) {
 
   /*
    * The pane keeps its exact 90vh so the sources panel below it starts in the
-   * same place; the map inside is rounded down to a whole pixel so Mapbox's
-   * canvas and its controls land on the pixel grid rather than a fraction of
-   * one. deck.gl used to size its container this way.
+   * same place; the map inside is rounded to the nearest whole pixel, so
+   * Mapbox's canvas and its controls land on the pixel grid rather than a
+   * fraction of one. deck.gl used to size its container this way, and to the
+   * nearest pixel rather than down -- at 844px tall, 90vh is 759.6 and the old
+   * container was 760.
    */
   #map {
-    height: round(down, 90vh, 1px);
+    height: round(90vh, 1px);
   }
 
   .panel-sources { order: 3; }
@@ -442,16 +444,17 @@ html.no-js .panel-sources > [data-city]:not([data-city="paris"]) {
 /*
  * On narrow screens the map pane is 90vh, which is rarely a whole number of
  * pixels. The legend hangs off the bottom of it, so a fractional height leaves
- * the dial straddling a half pixel and softens every edge of it. Nudging it up
- * by the fractional part lands it back on a whole pixel. deck.gl used to size
- * its own container in whole pixels, so this never arose before.
+ * the dial straddling a half pixel and softens every edge of it. Shifting it
+ * by the remainder lands it back on a whole pixel -- up where 90vh rounds down,
+ * down where it rounds up. deck.gl used to size its own container in whole
+ * pixels, so this never arose before.
  *
  * Where round() is unsupported the whole declaration is ignored and the legend
  * simply sits where it otherwise would.
  */
 @media (max-width: 899.98px) {
   .legend-wrap {
-    bottom: calc(90vh - round(down, 90vh, 1px));
+    bottom: calc(90vh - round(90vh, 1px));
   }
 }
 
