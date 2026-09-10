@@ -11,10 +11,10 @@
  * exactly.
  *
  * Usage:
- *   NODE_PATH=/opt/node22/lib/node_modules node test/capture.cjs <baseUrl> <outDir>
+Usage: node test/capture.cjs <baseUrl> <outDir>
  */
 
-const { chromium } = require('playwright');
+const { chromium } = require('./playwright.cjs');
 const fs = require('fs');
 const path = require('path');
 const { installFixtures } = require('./fixtures.cjs');

@@ -9,10 +9,10 @@
  * exactly, and the test does not depend on the network or on what the tiles
  * happen to look like at a given zoom.
  *
- * Usage: NODE_PATH=/opt/node22/lib/node_modules node test/hover-pipeline.cjs [baseUrl]
+ * Usage: node test/hover-pipeline.cjs [baseUrl]
  */
 
-const { chromium } = require('playwright');
+const { chromium } = require('./playwright.cjs');
 const path = require('path');
 
 const BASE_URL = process.argv[2] || 'http://localhost:8080';

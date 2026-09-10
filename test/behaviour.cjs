@@ -5,10 +5,10 @@
  * The map is blocked here deliberately -- none of this depends on tiles, and
  * the sampling path has its own test in hover-pipeline.cjs.
  *
- * Usage: NODE_PATH=/opt/node22/lib/node_modules node test/behaviour.cjs [baseUrl]
+ * Usage: node test/behaviour.cjs [baseUrl]
  */
 
-const { chromium } = require('playwright');
+const { chromium } = require('./playwright.cjs');
 const { installFixtures } = require('./fixtures.cjs');
 
 const BASE_URL = process.argv[2] || 'http://localhost:8080';

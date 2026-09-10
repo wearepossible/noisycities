@@ -8,10 +8,10 @@
  * image library as a dependency, which would defeat the point of this work.
  *
  * Usage:
- *   NODE_PATH=/opt/node22/lib/node_modules node test/compare.cjs <dirA> <dirB> [diffDir]
+Usage: node test/compare.cjs <dirA> <dirB> [diffDir]
  */
 
-const { chromium } = require('playwright');
+const { chromium } = require('./playwright.cjs');
 const fs = require('fs');
 const path = require('path');
 const crypto = require('crypto');

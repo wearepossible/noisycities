@@ -98,8 +98,12 @@ npm test          # gauge geometry, and the colour and volume parity check
 ```
 
 Those two need nothing but Node. The rest drive a browser, so they need
-Playwright — which is deliberately *not* a project dependency; install it
-globally — and a running site:
+Playwright and a running site. Playwright is deliberately *not* a project
+dependency — install it globally and the checks will find it:
+
+```sh
+npm install -g playwright && npx playwright install chromium
+```
 
 ```sh
 npm run dev &                            # serves on :8000

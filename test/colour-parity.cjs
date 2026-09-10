@@ -12,7 +12,7 @@
  * removed it reports a skip rather than failing. It is a migration proof, not
  * an ongoing test.
  *
- * Usage: NODE_PATH=... node test/colour-parity.cjs
+ * Usage: node test/colour-parity.cjs
  */
 
 let _, nearestColor, d3;
