@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en" class="no-js">
+
+<head>
+  <script>
+    if (!window.location.pathname.endsWith("/")) {
+      window.location = window.location + "/"
+    }
+  </script>
+
+  <meta charset="utf-8" />
+  <link rel="icon" href="./favicon.ico" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#000000" />
+  <meta property="og:site_name" content="NOISY CITIES" />
+  <meta property="og:title" content="NOISY CITIES" />
+  <meta property="og:description"
+    content="Our noise maps show the levels of exposure to noise in London, Paris and New York. Use your mouse to explore the loudest and quietest spots in our Car Free Megacities." />
+  <meta property="og:image" content="./noisyCity.png">
+  <meta name="NOISY CITIES"
+    content="Our noise maps show the levels of exposure to noise in London, Paris and New York. Use your mouse to explore the loudest and quietest spots in our Car Free Megacities." />
+  <link rel="apple-touch-icon" href="./logo192.png" />
+  <link rel="manifest" href="./manifest.json" />
+  <title>NOISY CITIES</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans|Sumana|Playfair+Display">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;900&display=swap">
+
+  <link rel="stylesheet" href="./vendor/mapbox-gl.css">
+  <link rel="stylesheet" href="./styles.css">
+
+  <!-- Global site tag (gtag.js) - Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-4SHTWFXPZX"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag() { dataLayer.push(arguments); }
+    gtag('js', new Date());
+
+    gtag('config', 'G-4SHTWFXPZX');
+  </script>
+</head>
+
+<body class="drawer-open">
+  <noscript>You need to enable JavaScript to run this app.</noscript>
+
+  <div class="layout">
+    <aside class="sidebar">
+
+      <!-- Intro: logo, blurb, city tabs, share links. Stays above the map on
+           narrow screens; the sources block below moves under the map. -->
+      <section class="panel panel-intro">
+        <div class="lang-row">
+          <button type="button" class="btn btn-link lang-btn" data-set-language="en"><span class="lang-en">EN</span></button>
+          <button type="button" class="btn btn-link lang-btn" data-set-language="fr"><span class="lang-fr">FR</span></button>
+        </div>
+
+        <a href="https://www.carfreemegacities.org" target="_blank" rel="noopener noreferrer">
+          <img src="./assets/carFree.png" alt="Car Free Megacities logo" class="logo-carfree" />
+        </a>
+
+        <div data-lang="en">
+          <p>Our noise maps show the levels of exposure to noise in London, Paris and New York.</p>
+          <p>Use your mouse to explore the loudest and quietest spots.</p>
+          <p>We’ve created this to help people learn more about noise pollution in these megacities.</p>
+        </div>
+        <div data-lang="fr">
+          <p>Notre carte du bruit montre le niveau d'exposition au bruit dans les villes de Londres, Paris et New York.</p>
+          <p>Utilisez votre souris pour explorer les coins les plus calmes ainsi que les plus bruyants.</p>
+          <p>Ce travail a été conçu dans le but de rendre perceptible la pollution sonore dans ces mégapoles.</p>
+        </div>
+
+        <div class="tabs-row">
+          <div class="tabs">
+            <div class="tabs-list">
+              <button type="button" class="tab" data-city="paris">Paris</button>
+              <button type="button" class="tab" data-city="nyc">New York</button>
+              <button type="button" class="tab" data-city="london"><span data-lang="en">London</span><span data-lang="fr">Londres</span></button>
+              <span class="tabs-ink" aria-hidden="true"></span>
+            </div>
+          </div>
+        </div>
+
+        <div data-lang="en">
+          <div>Like what you see? Share it on:<br /><span class="share-row"><span class="share-gap"></span>
+            <a class="share" data-share="twitter" target="_blank" rel="noopener noreferrer" aria-label="Share on Twitter"></a>
+            <a class="share" data-share="facebook" target="_blank" rel="noopener noreferrer" aria-label="Share on Facebook"></a>
+            <a class="share" data-share="linkedin" target="_blank" rel="noopener noreferrer" aria-label="Share on LinkedIn"></a>
+          </span></div>
+          <p>Want more like this? Sign up to our <a href="https://www.carfreemegacities.org/noise-pollution" target="_blank" rel="noopener noreferrer"> mailing list</a>.</p>
+        </div>
+        <div data-lang="fr">
+          <div>Appréciez-vous ce contenu? Partagez le sur:<br /><span class="share-row"><span class="share-gap"></span>
+            <a class="share" data-share="twitter" target="_blank" rel="noopener noreferrer" aria-label="Partager sur Twitter"></a>
+            <a class="share" data-share="facebook" target="_blank" rel="noopener noreferrer" aria-label="Partager sur Facebook"></a>
+            <a class="share" data-share="linkedin" target="_blank" rel="noopener noreferrer" aria-label="Partager sur LinkedIn"></a>
+          </span></div>
+          <p>Vous en voulez plus? Abonnez vous à notre <a href="https://www.carfreemegacities.org/noise-pollution" target="_blank" rel="noopener noreferrer"> newsletter</a>.</p>
+        </div>
+      </section>
+
+      <!-- Sources: one block per city per language, plus the credits. -->
+      <section class="panel panel-sources">
+
+        <div data-city="paris" data-lang="en">
+          <p>Remember: decibels are not a linear scale. Instead, we experience an increase of 10 decibels as a doubling of loudness. For example, 80 decibels is four times louder than 60 decibels.</p>
+          <p><span style="font-weight: bold">Data sources</span>: <a href="https://carto.bruitparif.fr/" target="_blank" rel="noopener noreferrer">Bruitparif</a>. Data is taken from monitoring stations on the <a href="https://rumeur.bruitparif.fr/main" target="_blank" rel="noopener noreferrer">Rumeur network</a> and intermediate points are modelled and validated against the collected data, including the effects of average weather conditions on noise levels.  <a href="https://www.bruitparif.fr/pages/En-tete/700%20Accompagner/800%20CSB%20en%20IdF/680%20Une%20m%C3%A9thodologie%20rigoureuse/2018-08-21%20-%20M%C3%A9thologie%20d'%C3%A9laboration%20des%20cartes%20strat%C3%A9giques%20de%20bruit%20de%203%C3%A8me%20%C3%A9ch%C3%A9ance%20(2017)%20en%20%C3%8Ele-de-France.pdf" target="_blank" rel="noopener noreferrer">Methodological information (in French).</a></p>
+          <p>Data are under the third five year cycle of EU Environmental Noise Directive reporting. Data is ‘Lden’ (24 hour - day, evening and night) average noise levels for road traffic noise only (hence low levels can be seen on the maps close to railway stations and airports).</p>
+        </div>
+        <div data-city="paris" data-lang="fr">
+          <p>Il est à noter que les décibels ne suivent pas une échelle linéaire. Une augmentation de 10 décibels est ressenti comme un doublement du volume. Par exemple, 80 décibels est quatre fois plus fort que 60 décibels.</p>
+          <p><span style="font-weight: bold">Sources des données</span>: <a href="https://carto.bruitparif.fr/" target="_blank" rel="noopener noreferrer">Bruitparif</a>. Les données sont extraites depuis les stations <a href="https://rumeur.bruitparif.fr/main" target="_blank" rel="noopener noreferrer">Rumeur network</a>. Les mesures intermédiaires sont extrapolées et validées avec les données collectées. <a href="https://www.bruitparif.fr/pages/En-tete/700%20Accompagner/800%20CSB%20en%20IdF/680%20Une%20m%C3%A9thodologie%20rigoureuse/2018-08-21%20-%20M%C3%A9thologie%20d'%C3%A9laboration%20des%20cartes%20strat%C3%A9giques%20de%20bruit%20de%203%C3%A8me%20%C3%A9ch%C3%A9ance%20(2017)%20en%20%C3%8Ele-de-France.pdf" target="_blank" rel="noopener noreferrer">Information sur la méthodologie</a></p>
+          <p>Il s'agit de la troisième itération (cycle de 5 années) de récolte de données imposée par la directive européenne sur le bruit environnemental. Les données sont du type ‘Lden’ (24 heures 7/7, jour et soir), le niveau de bruit moyen concerne le trafic routier seulement (ce qui explique les zones de faible bruit aux alentours des gares et des aéroports).</p>
+        </div>
+
+        <div data-city="london" data-lang="en">
+          <p>Remember: decibels are not a linear scale. Instead, we experience an increase of 10 decibels as a doubling of loudness. For example, 80 decibels is four times louder than 60 decibels.</p>
+          <p><span style="font-weight: bold">Data Sources</span>: <a href="https://environment.data.gov.uk/dataset/fd1c6327-ad77-42ae-a761-7c6a0866523d" target="_blank" rel="noopener noreferrer">DEFRA (Department for Environment, Transport and Rural Affairs)</a>. Data is entirely modelled and not directly from any monitoring stations. The London data only shows main roads as the UK only carries out the minimum mapping required under the EU Environmental Noise Directive.
+            <a href="https://www.gov.uk/government/publications/strategic-noise-mapping-2019" target="_blank" rel="noopener noreferrer"> More information.</a></p>
+          <p>Data are under the third five year cycle of EU Environmental Noise Directive reporting. Data is ‘Lden’ (24 hour - day, evening and night) average noise levels for road traffic noise only (hence low levels can be seen on the maps close to railway stations and airports).</p>
+        </div>
+        <div data-city="london" data-lang="fr">
+          <p>Il est à noter que les décibels ne suivent pas une échelle linéaire. Une augmentation de 10 décibels est ressenti comme un doublement du volume. Par exemple, 80 décibels est quatre fois plus fort que 60 décibels.</p>
+          <p><span style="font-weight: bold">Sources des données</span>: <a href="https://environment.data.gov.uk/dataset/fd1c6327-ad77-42ae-a761-7c6a0866523d" target="_blank" rel="noopener noreferrer">DEFRA (Department for Environment, Transport and Rural Affairs)</a>. Les données sont entièrement modélisées sans l'aide de collecte directe depuis des stations de monitoring. Les données sur Londres ne concernent que les routes principales, correspondant au minimum requis par la directive de l'UE sur le bruit dans l'environnement.
+            <a href="https://www.gov.uk/government/publications/strategic-noise-mapping-2019" target="_blank" rel="noopener noreferrer"> Plus d'information ici.</a></p>
+          <p>Il s'agit de la troisième itération (cycle de 5 années) de récolte de données imposée par la directive européenne sur le bruit dans l'environnement. Les données sont du type ‘Lden’ (24 heures 7/7, jour et soir), le niveau de bruit moyen concerne le trafic routier seulement (ce qui explique les zones de faible bruit aux alentours des gares et des aéroports).</p>
+        </div>
+
+        <div data-city="nyc" data-lang="en">
+          <p>Remember: decibels are not a linear scale. Instead, we experience an increase of 10 decibels as a doubling of loudness. For example, 80 decibels is four times louder than 60 decibels.</p>
+          <p><span style="font-weight: bold">Data Sources</span>: <a href="https://maps.dot.gov/BTS/NationalTransportationNoiseMap/" target="_blank" rel="noopener noreferrer">US DOT National Transportation Noise map</a>. The New York map includes both road traffic and aircraft noise, and assumes road traffic is evenly distributed through the day. <a href="https://www.bts.gov/sites/bts.dot.gov/files/docs/explore-topics-and-geography/geography/203606/btsnoisemappingtooldocumentationmarch2016.pdf" target="_blank" rel="noopener noreferrer">Methodological information</a></p>
+        </div>
+        <div data-city="nyc" data-lang="fr">
+          <p>Il est à noter que les décibels ne suivent pas une échelle linéaire. Une augmentation de 10 décibels est ressenti comme un doublement du volume. Par exemple, 80 décibels est quatre fois plus fort que 60 décibels.</p>
+          <p><span style="font-weight: bold">Sources des données</span>: <a href="https://maps.dot.gov/BTS/NationalTransportationNoiseMap/" target="_blank" rel="noopener noreferrer">US DOT National Transportation Noise map</a>. La carte de New York, à la différence des autres villes, inclus à la fois le traffic aérien et routier, elle assume également que le traffic est uniformément distribué au cours de la journée. <a href="https://www.bts.gov/sites/bts.dot.gov/files/docs/explore-topics-and-geography/geography/203606/btsnoisemappingtooldocumentationmarch2016.pdf" target="_blank" rel="noopener noreferrer">Information sur la méthodologie.</a></p>
+        </div>
+
+        <div class="credits">
+          <div style="text-align: center">
+            <span class="credit-possible"><a href="https://www.wearepossible.org/" target="_blank" rel="noopener noreferrer"> <img alt="possible logo" class="logo-possible" src="./assets/possible.png" /></a></span>
+          </div>
+          <div class="credit-designed"> Designed by
+            <span class="credit-jetpack"><a href="https://www.jetpack.ai" target="_blank" rel="noopener noreferrer"> <img alt="jetpack logo" class="logo-jetpack" src="./assets/Jetpack-small.png" /></a></span>
+          </div>
+          <div class="outro">
+            <p data-lang="en" class="outro-text">These sonifications build on <br /> <a href="https://noisy-city.jetpack.ai/" target="_blank" rel="noopener noreferrer">Karim Douieb's original Noisy City map of Brussels</a>.</p>
+            <p data-lang="fr" class="outro-text">Cette représentation auditive des données est construite sur base du travail de <a href="https://noisy-city.jetpack.ai/" target="_blank" rel="noopener noreferrer">Karim Douieb avec sa carte du bruit de Brussels</a>.</p>
+          </div>
+        </div>
+      </section>
+    </aside>
+
+    <main class="map-pane">
+      <div id="map"></div>
+
+      <!-- Follows the cursor, showing the colour under it. -->
+      <div id="tooltip" class="tooltip" hidden>
+        <div class="tooltip-swatch"></div>
+      </div>
+
+      <div class="legend-wrap">
+        <div class="legend">
+          <div id="gauge"></div>
+          <div class="legend-caption">
+            <span data-lang="en">NOISE INTENSITY (dB)</span><span data-lang="fr">INTENSITÉ DU BRUIT (dB)</span>
+          </div>
+          <div class="legend-mute">
+            <span class="hovertip">
+              <button type="button" id="mute" class="btn btn-circle" aria-label="Unmute">
+                <svg viewBox="64 64 896 896" width="1em" height="1em" fill="currentColor" aria-hidden="true" focusable="false"><path d="M625.9 115c-5.9 0-11.9 1.6-17.4 5.3L254 352H90c-8.8 0-16 7.2-16 16v288c0 8.8 7.2 16 16 16h164l354.5 231.7c5.5 3.6 11.6 5.3 17.4 5.3 16.7 0 32.1-13.3 32.1-32.1V147.1c0-18.8-15.4-32.1-32.1-32.1zM586 803L293.4 611.7l-18-11.7H146V424h129.4l17.9-11.7L586 221v582zm348-327H806c-8.8 0-16 7.2-16 16v40c0 8.8 7.2 16 16 16h128c8.8 0 16-7.2 16-16v-40c0-8.8-7.2-16-16-16zm-41.9 261.8l-110.3-63.7a15.9 15.9 0 00-21.7 5.9l-19.9 34.5c-4.4 7.6-1.8 17.4 5.8 21.8L856.3 800a15.9 15.9 0 0021.7-5.9l19.9-34.5c4.4-7.6 1.7-17.4-5.8-21.8zM760 344a15.9 15.9 0 0021.7 5.9L892 286.2c7.6-4.4 10.2-14.2 5.8-21.8L878 230a15.9 15.9 0 00-21.7-5.9L746 287.8a15.99 15.99 0 00-5.8 21.8L760 344z"/></svg>
+              </button>
+              <span class="hovertip-bubble" id="mute-tip">Unmute</span>
+            </span>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!--
+    Deliberately outside the layout: switching city or language must not
+    disturb playback, and anything inside a region that gets rebuilt would
+    restart the loop from the beginning.
+  -->
+  <audio id="noise-audio" src="./assets/ES_CityStreet9.mp3" autoplay loop muted></audio>
+
+  <div class="drawer-root" id="drawer-root">
+    <div class="drawer-mask"></div>
+    <div class="drawer-wrapper">
+      <div class="drawer" role="dialog" aria-modal="true" aria-labelledby="drawer-title">
+        <div class="drawer-header">
+          <div class="drawer-title" id="drawer-title">Volume On</div>
+        </div>
+        <div class="drawer-body">
+          <p>This data visualization is an experiment aiming at making you feel and hear the noise pollution in various cities.</p>
+          <p>If you want to experience the sound just crank your volume up and click on the "With sound" button.</p>
+          <div class="drawer-actions">
+            <button type="button" class="btn btn-default" id="without-sound">Without sound</button>
+            <button type="button" class="btn btn-primary" id="with-sound">With sound</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="./vendor/mapbox-gl.js"></script>
+  <script type="module" src="./app.js"></script>
+</body>
+
+</html>

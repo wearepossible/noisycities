@@ -1,0 +1,17 @@
+<svg class="chart" width="240" height="168"><g transform="translate(5, 5)"><g class="main" transform="translate(115, 115)"><g class="gauge"><path fill="#feebe2" d="M-92.299,29.009A96.75,96.75,0,0,1,-96.313,-9.185L-77.864,-7.246A78.2,78.2,0,0,0,-74.656,23.276Z"></path><path fill="#fdd0ce" d="M-96.118,-11.041A96.75,96.75,0,0,1,-84.251,-47.565L-68.185,-38.289A78.2,78.2,0,0,0,-77.669,-9.101Z"></path><path fill="#fbb4b9" d="M-83.318,-49.181A96.75,96.75,0,0,1,-57.62,-77.72L-46.716,-62.712A78.2,78.2,0,0,0,-67.252,-39.905Z"></path><path fill="#f98ead" d="M-56.111,-78.817A96.75,96.75,0,0,1,-21.027,-94.437L-17.17,-76.292A78.2,78.2,0,0,0,-45.207,-63.809Z"></path><path fill="#f768a1" d="M-19.202,-94.825A96.75,96.75,0,0,1,19.202,-94.825L15.345,-76.68A78.2,78.2,0,0,0,-15.345,-76.68Z"></path><path fill="#de4196" d="M21.027,-94.437A96.75,96.75,0,0,1,56.111,-78.817L45.207,-63.809A78.2,78.2,0,0,0,17.17,-76.292Z"></path><path fill="#c51b8a" d="M57.62,-77.72A96.75,96.75,0,0,1,83.318,-49.181L67.252,-39.905A78.2,78.2,0,0,0,46.716,-62.712Z"></path><path fill="#a00e81" d="M84.251,-47.565A96.75,96.75,0,0,1,96.118,-11.041L77.669,-9.101A78.2,78.2,0,0,0,68.185,-38.289Z"></path><path fill="#7a0177" d="M96.313,-9.185A96.75,96.75,0,0,1,92.299,29.009L74.656,23.276A78.2,78.2,0,0,0,77.864,-7.246Z"></path><g class="tick-label"><text transform="translate(-106.93596679947359,
+                      -11.239423012854438)
+              rotate(-1.4660765716752369)" dy="0.35em" text-anchor="middle" font-size="9.775">40</text></g><g class="tick-label"><text transform="translate(-93.11938154192178,
+                      -53.76249999999999)
+              rotate(-1.0471975511965979)" dy="0.35em" text-anchor="middle" font-size="9.775">45</text></g><g class="tick-label"><text transform="translate(-63.20160925274819,
+                      -86.98955232016621)
+              rotate(-0.6283185307179587)" dy="0.35em" text-anchor="middle" font-size="9.775">50</text></g><g class="tick-label"><text transform="translate(-22.35570455517958,
+                      -105.17532076890245)
+              rotate(-0.20943951023931962)" dy="0.35em" text-anchor="middle" font-size="9.775">55</text></g><g class="tick-label"><text transform="translate(22.355704555179567,
+                      -105.17532076890247)
+              rotate(0.2094395102393195)" dy="0.35em" text-anchor="middle" font-size="9.775">60</text></g><g class="tick-label"><text transform="translate(63.20160925274818,
+                      -86.98955232016623)
+              rotate(0.6283185307179586)" dy="0.35em" text-anchor="middle" font-size="9.775">65</text></g><g class="tick-label"><text transform="translate(93.11938154192177,
+                      -53.76250000000002)
+              rotate(1.0471975511965976)" dy="0.35em" text-anchor="middle" font-size="9.775">70</text></g><g class="tick-label"><text transform="translate(106.93596679947359,
+                      -11.239423012854463)
+              rotate(1.4660765716752366)" dy="0.35em" text-anchor="middle" font-size="9.775">75</text></g></g><g class="gaugePin" style="opacity: 0;"><path transform="translate(0, -78.2)" d="M0,-7.019L6.079,3.51L-6.079,3.51Z" fill="black" style="opacity: 1;"></path></g><text class="gaugeLabel" style="opacity: 0;"></text></g></g></svg>

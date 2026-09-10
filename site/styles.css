@@ -1,0 +1,603 @@
+/*
+ * Noisy Cities styles.
+ *
+ * This replaces Ant Design's stylesheet and component CSS. The values here
+ * were measured from the previous build rather than guessed, so the page
+ * renders identically -- see test/capture.cjs, which compares the two at the
+ * pixel level across a range of viewports.
+ */
+
+/* --- Foundations --------------------------------------------------------- */
+
+/*
+ * The system font stack and 14px base came from Ant Design's reset, which
+ * applied them to its layout components. Poppins is only ever the body font;
+ * every visible element sits inside a container that overrides it. That is how
+ * the site has always rendered, odd as it looks.
+ */
+:root {
+  --font-ui: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue",
+    Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji",
+    "Segoe UI Symbol", "Noto Color Emoji";
+  --text: rgba(0, 0, 0, 0.88);
+  --brand-pink: #bc0978;
+  --accent-blue: #1677ff;
+  --border: #d9d9d9;
+}
+
+html {
+  line-height: 1.15;
+  -webkit-text-size-adjust: 100%;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: 'Poppins', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* The intro drawer locks the page behind it, as Ant Design's drawer did. */
+body.drawer-open {
+  overflow: hidden;
+}
+
+p {
+  margin: 0 0 1em;
+}
+
+img {
+  border-style: none;
+  vertical-align: middle;
+}
+
+a {
+  color: var(--brand-pink);
+  text-decoration: none;
+  background-color: transparent;
+  outline: none;
+  cursor: pointer;
+  transition: color 0.3s;
+}
+
+::selection {
+  color: #fff;
+  background: var(--brand-pink);
+}
+
+/* Hidden alternatives: the copy for every city and language is in the markup,
+   and only the current combination is shown. */
+[hidden] {
+  display: none !important;
+}
+
+/*
+ * Before the script runs -- and for anyone reading without JavaScript, who
+ * gets the words even though the map needs a browser that can draw it -- show
+ * English and Paris. The script drops the `no-js` class as it starts and takes
+ * over, so there is no flash of both languages at once.
+ */
+html.no-js [data-lang="fr"],
+html.no-js .panel-sources > [data-city]:not([data-city="paris"]) {
+  display: none;
+}
+
+/* --- Layout -------------------------------------------------------------- */
+
+.layout {
+  position: relative;
+  width: 100vw;
+  overflow: hidden;
+  display: flex;
+  flex-flow: row wrap;
+  font-family: var(--font-ui);
+  font-size: 14px;
+  color: #000;
+}
+
+.sidebar {
+  flex: 0 0 25%;
+  max-width: 25%;
+  min-height: 1px;
+  height: 100vh;
+  padding: 16px;
+  overflow-y: scroll;
+}
+
+.map-pane {
+  position: relative;
+  flex: 0 0 75%;
+  max-width: 75%;
+  min-height: 1px;
+  height: 100vh;
+}
+
+#map {
+  width: 100%;
+  height: 100%;
+}
+
+/*
+ * Below the breakpoint the three regions stack, with the map between the
+ * intro and the sources. `display: contents` dissolves the sidebar so its two
+ * panels become siblings of the map and can be ordered around it -- the
+ * previous build achieved this by rendering the panel component twice.
+ */
+@media (max-width: 899.98px) {
+  .sidebar {
+    display: contents;
+  }
+
+  .panel-intro,
+  .panel-sources {
+    flex: 0 0 100%;
+    max-width: 100%;
+    min-height: 1px;
+    padding: 16px;
+  }
+
+  .panel-intro { order: 1; }
+  .map-pane {
+    order: 2;
+    flex: 0 0 100%;
+    max-width: 100%;
+    height: 90vh;
+  }
+
+  /*
+   * The pane keeps its exact 90vh so the sources panel below it starts in the
+   * same place; the map inside is rounded to the nearest whole pixel, so
+   * Mapbox's canvas and its controls land on the pixel grid rather than a
+   * fraction of one. deck.gl used to size its container this way, and to the
+   * nearest pixel rather than down -- at 844px tall, 90vh is 759.6 and the old
+   * container was 760.
+   */
+  #map {
+    height: round(90vh, 1px);
+  }
+
+  .panel-sources { order: 3; }
+}
+
+/* --- Buttons ------------------------------------------------------------- */
+
+.btn {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  height: 32px;
+  padding: 0 15px;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 1.15;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  background: transparent;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.2s cubic-bezier(0.645, 0.045, 0.355, 1);
+}
+
+.btn-default {
+  color: var(--text);
+  background: #fff;
+  border-color: var(--border);
+  box-shadow: 0 2px 0 rgba(0, 0, 0, 0.02);
+}
+
+.btn-primary {
+  color: #fff;
+  background: var(--accent-blue);
+  box-shadow: 0 2px 0 rgba(5, 145, 255, 0.1);
+}
+
+.btn-link {
+  color: var(--brand-pink);
+  text-decoration: underline;
+}
+
+.btn-circle {
+  width: 32px;
+  min-width: 32px;
+  padding: 0;
+  border-radius: 50%;
+  color: var(--text);
+  background: #fff;
+  border-color: var(--border);
+  box-shadow: 0 2px 0 rgba(0, 0, 0, 0.02);
+}
+
+/* Muted is the resting state: a dashed outline and faded, as Ant Design's
+   "dashed" button type rendered it. */
+.btn-circle.is-muted {
+  border-style: dashed;
+  opacity: 0.3;
+}
+
+.btn-circle svg {
+  display: inline-flex;
+  width: 14px;
+  height: 14px;
+  line-height: 0;
+}
+
+/* --- Language switch ----------------------------------------------------- */
+
+.lang-row {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: -35px;
+}
+
+/* The negative margin pulls the two labels together; it was inline on the
+   first of the pair. */
+.lang-btn[data-set-language="en"] span {
+  margin-right: -12px;
+}
+
+.lang-btn.is-inactive span {
+  color: grey;
+  text-decoration: none;
+}
+
+/* --- City tabs ----------------------------------------------------------- */
+
+.tabs-row {
+  display: flex;
+  flex-flow: row wrap;
+}
+
+.tabs {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 100%;
+  height: 46px;
+  margin: 0 0 16px;
+  overflow: hidden;
+}
+
+/* The hairline running the full width beneath the tab row. */
+.tabs::before {
+  content: '';
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  border-bottom: 1px solid rgba(5, 5, 5, 0.06);
+}
+
+.tabs-list {
+  position: relative;
+  display: flex;
+  flex: 0 0 auto;
+  margin: 0 auto;
+}
+
+.tab {
+  position: relative;
+  display: flex;
+  align-items: center;
+  flex: 0 0 auto;
+  /* City names stay on one line and are clipped if the sidebar is too narrow,
+     rather than wrapping "New York" onto two. */
+  white-space: nowrap;
+  padding: 12px 0;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 22px;
+  color: var(--text);
+  background: none;
+  border: 0;
+  cursor: pointer;
+  transition: color 0.3s;
+}
+
+.tab + .tab {
+  margin-left: 32px;
+}
+
+/*
+ * Just above the breakpoint the sidebar is a quarter of a narrow window, and
+ * three city names with 32px between them stop fitting. Ant Design dealt with
+ * this by hiding the overflowing city behind a "more" dropdown -- a whole
+ * collapsing-tab mechanism, and a city you could no longer see. Closing the
+ * gap a little keeps all three visible and one click away, which is the point
+ * of the control.
+ *
+ * The threshold differs by language because "Londres" is wider than "London":
+ * 32px stops fitting below 936px in English and below 968px in French. Each
+ * language tightens only where it has to, so every width that used to fit is
+ * left exactly as it was.
+ */
+@media (min-width: 900px) and (max-width: 935.98px) {
+  .tab + .tab {
+    margin-left: 20px;
+  }
+}
+
+@media (min-width: 900px) and (max-width: 967.98px) {
+  [data-language="fr"] .tab + .tab {
+    margin-left: 20px;
+  }
+}
+
+.tab:hover {
+  color: var(--brand-pink);
+}
+
+.tab.is-active {
+  color: var(--accent-blue);
+  font-weight: 500;
+}
+
+/* Slides under the active tab; its position is set from the tab's geometry. */
+.tabs-ink {
+  position: absolute;
+  bottom: 0;
+  height: 2px;
+  background: var(--accent-blue);
+  pointer-events: none;
+  transition: left 0.3s, width 0.3s;
+}
+
+/* --- Share links --------------------------------------------------------- */
+
+.share-row {
+  display: flex;
+  align-items: flex-start;
+  flex-flow: row wrap;
+}
+
+.share-gap {
+  margin-right: 8px;
+}
+
+.share {
+  display: inline-block;
+  line-height: 0;
+}
+
+/* --- Sidebar credits ----------------------------------------------------- */
+
+.logo-carfree {
+  width: 100%;
+}
+
+.credit-possible {
+  text-align: center;
+  margin-top: 8px;
+}
+
+.logo-possible {
+  margin-left: 8px;
+  margin-right: 8px;
+  width: 60%;
+}
+
+.credit-designed {
+  text-align: center;
+  margin-top: 16px;
+}
+
+.credit-jetpack {
+  text-align: center;
+  margin-top: 8px;
+}
+
+.logo-jetpack {
+  margin-left: 8px;
+  margin-right: 8px;
+  width: 120px;
+}
+
+.outro {
+  font-size: 10px;
+  margin-top: 8px;
+  margin-bottom: 32px;
+}
+
+.outro-text {
+  text-align: center;
+}
+
+/* --- Cursor tooltip ------------------------------------------------------ */
+
+.tooltip {
+  position: absolute;
+  pointer-events: none;
+  z-index: 1;
+  width: 90px;
+  padding: 5px;
+  overflow: hidden;
+  font-size: 9px;
+  background: white;
+  border-radius: 200px;
+  box-shadow: 2px 2px 4px #ccc;
+}
+
+.tooltip-swatch {
+  width: 80px;
+  height: 80px;
+  border-radius: 200px;
+}
+
+/* --- Legend -------------------------------------------------------------- */
+
+.legend-wrap {
+  position: absolute;
+  right: 10px;
+  bottom: 0;
+  width: 300px;
+}
+
+/*
+ * On narrow screens the map pane is 90vh, which is rarely a whole number of
+ * pixels. The legend hangs off the bottom of it, so a fractional height leaves
+ * the dial straddling a half pixel and softens every edge of it. Shifting it
+ * by the remainder lands it back on a whole pixel -- up where 90vh rounds down,
+ * down where it rounds up. deck.gl used to size its own container in whole
+ * pixels, so this never arose before.
+ *
+ * Where round() is unsupported the whole declaration is ignored and the legend
+ * simply sits where it otherwise would.
+ */
+@media (max-width: 899.98px) {
+  .legend-wrap {
+    bottom: calc(90vh - round(90vh, 1px));
+  }
+}
+
+.legend {
+  position: absolute;
+  left: 20px;
+  bottom: 45px;
+  z-index: 1;
+  width: 250px;
+  height: 250px;
+  padding: 5px;
+  overflow: hidden;
+  font-size: 9px;
+  background-color: #ffffffdf;
+  border-radius: 2000px;
+  box-shadow: 2px 2px 4px #ccc;
+}
+
+.legend-caption {
+  text-align: center;
+  font-size: 12px;
+}
+
+.legend-mute {
+  position: absolute;
+  top: 130px;
+  width: 100%;
+  margin-left: -5px;
+  text-align: center;
+}
+
+/* --- Hover tooltip on the mute button ------------------------------------ */
+
+.hovertip {
+  position: relative;
+  display: inline-block;
+}
+
+.hovertip-bubble {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 6px 8px;
+  font-size: 14px;
+  line-height: 1.5714;
+  color: #fff;
+  white-space: nowrap;
+  background: rgba(0, 0, 0, 0.85);
+  border-radius: 6px;
+  box-shadow: 0 6px 16px 0 rgba(0, 0, 0, 0.08);
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.15s;
+  pointer-events: none;
+  z-index: 1070;
+}
+
+.hovertip:hover .hovertip-bubble,
+.hovertip:focus-within .hovertip-bubble {
+  opacity: 1;
+  visibility: visible;
+}
+
+/* --- Intro drawer -------------------------------------------------------- */
+
+/*
+ * Three nested elements, mirroring how Ant Design built this. The nesting is
+ * not decoration: the panel that carries the white background is statically
+ * positioned, and text on a static opaque element is rendered with subpixel
+ * antialiasing. Move the background onto the positioned wrapper and the
+ * browser promotes it to its own layer, which silently switches the type to
+ * greyscale antialiasing and makes it look noticeably different.
+ */
+.drawer-root {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+}
+
+.drawer-mask {
+  position: absolute;
+  inset: 0;
+  z-index: 1000;
+  background: rgba(0, 0, 0, 0.45);
+}
+
+.drawer-wrapper {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 1000;
+  height: 350px;
+  box-shadow:
+    0 -6px 16px 0 rgba(0, 0, 0, 0.08),
+    0 -3px 6px -4px rgba(0, 0, 0, 0.12),
+    0 -9px 28px 8px rgba(0, 0, 0, 0.05);
+}
+
+.drawer {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  font-family: var(--font-ui);
+  font-size: 14px;
+  color: var(--text);
+  background: #fff;
+}
+
+.drawer-header {
+  display: flex;
+  align-items: center;
+  flex: 0 0 auto;
+  padding: 16px 24px;
+  font-size: 16px;
+  line-height: 24px;
+  border-bottom: 1px solid rgba(5, 5, 5, 0.06);
+}
+
+.drawer-title {
+  flex: 1;
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 24px;
+  color: var(--text);
+}
+
+.drawer-body {
+  flex: 1;
+  padding: 24px;
+  font-size: 14px;
+  line-height: 1.15;
+}
+
+/* The 8px gutter was expressed as a negative margin with padded children. */
+.drawer-actions {
+  display: flex;
+  justify-content: flex-end;
+  margin: 0 -4px 24px;
+}
+
+.drawer-actions .btn-primary {
+  margin-left: 8px;
+}
