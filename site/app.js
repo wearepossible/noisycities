@@ -143,6 +143,18 @@ const ui = createUi({
 });
 
 function update() {
+  /*
+   * The stylesheet needs the current language: the city tabs need a little
+   * less space between them in French, where "Londres" is wider.
+   *
+   * Note this is deliberately NOT the `lang` attribute, which would be the
+   * accessible thing to set -- the document still claims English while showing
+   * French, as it always has. Setting it correctly changes how the browser
+   * renders French text, which would break the pixel-for-pixel match this
+   * rewrite is held to. Worth doing as its own change.
+   */
+  document.documentElement.setAttribute('data-language', state.language);
+
   ui.render(state);
   writeUrlState(state);
 }

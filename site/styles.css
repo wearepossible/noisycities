@@ -266,6 +266,7 @@ html.no-js .panel-sources > [data-city]:not([data-city="paris"]) {
 .tabs-list {
   position: relative;
   display: flex;
+  flex: 0 0 auto;
   margin: 0 auto;
 }
 
@@ -273,6 +274,10 @@ html.no-js .panel-sources > [data-city]:not([data-city="paris"]) {
   position: relative;
   display: flex;
   align-items: center;
+  flex: 0 0 auto;
+  /* City names stay on one line and are clipped if the sidebar is too narrow,
+     rather than wrapping "New York" onto two. */
+  white-space: nowrap;
   padding: 12px 0;
   font-family: inherit;
   font-size: 14px;
@@ -287,6 +292,31 @@ html.no-js .panel-sources > [data-city]:not([data-city="paris"]) {
 
 .tab + .tab {
   margin-left: 32px;
+}
+
+/*
+ * Just above the breakpoint the sidebar is a quarter of a narrow window, and
+ * three city names with 32px between them stop fitting. Ant Design dealt with
+ * this by hiding the overflowing city behind a "more" dropdown -- a whole
+ * collapsing-tab mechanism, and a city you could no longer see. Closing the
+ * gap a little keeps all three visible and one click away, which is the point
+ * of the control.
+ *
+ * The threshold differs by language because "Londres" is wider than "London":
+ * 32px stops fitting below 936px in English and below 968px in French. Each
+ * language tightens only where it has to, so every width that used to fit is
+ * left exactly as it was.
+ */
+@media (min-width: 900px) and (max-width: 935.98px) {
+  .tab + .tab {
+    margin-left: 20px;
+  }
+}
+
+@media (min-width: 900px) and (max-width: 967.98px) {
+  [data-language="fr"] .tab + .tab {
+    margin-left: 20px;
+  }
 }
 
 .tab:hover {

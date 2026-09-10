@@ -91,15 +91,28 @@ worthwhile too.
 ## The comparison harness
 
 `test/` holds the tooling used to check the rewrite against the React build it
-replaced. It needs Playwright, which is not a project dependency — install it
-globally if you want to run these.
+replaced.
 
 ```sh
-node test/gauge-geometry.cjs    # gauge SVG matches the original exactly
-node test/colour-parity.cjs     # colour matching and volume curve match
+npm test          # gauge geometry, and the colour and volume parity check
+```
+
+Those two need nothing but Node. The rest drive a browser, so they need
+Playwright — which is deliberately *not* a project dependency; install it
+globally — and a running site:
+
+```sh
+npm run dev &                            # serves on :8000
+npm run test:browser                     # behaviour, and the hover pipeline
 node test/capture.cjs  <url> <dir>       # screenshot a site across viewports
 node test/compare.cjs  <dirA> <dirB>     # compare two sets, pixel for pixel
 ```
+
+`test/colour-parity.cjs` compares against the libraries this replaced, so it
+reports a skip now that they are uninstalled; it passed across 140,699 samples
+at the time of the rewrite. `test/hover-pipeline.cjs` serves Mapbox a flat
+one-colour style so the real WebGL sampling path can be checked without
+depending on tiles or the network.
 
 `test/fixtures/gauge-original.svg` is the gauge as the previous build actually
 rendered it, kept as the reference. `test/fixtures/fonts/` is a local copy of
