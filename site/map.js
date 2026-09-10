@@ -92,13 +92,48 @@ export function createMap(container, { onSample, onLeave }) {
     pitch: 0,
     bearing: 0,
     minZoom: start.zoom,
-    maxBounds: start.bbox,
     // Required by readPixel above.
     preserveDrawingBuffer: true,
   });
 
+  if (typeof window !== 'undefined') window.__map = map; // exposed for tests
+  if (typeof window !== 'undefined') window.__map = map; // exposed for tests
   map.addControl(new mapboxgl.NavigationControl(), 'top-left');
   map.getCanvas().style.cursor = 'crosshair';
+
+  let currentCity = DEFAULT_CITY;
+
+  /*
+   * Keep the map's centre inside the city's box.
+   *
+   * Mapbox's own maxBounds would be the obvious tool, but it constrains the
+   * whole viewport rather than the centre: it zooms in until the box fills the
+   * window, which overrides the framing each city was given. Paris rendered at
+   * zoom 10.4 instead of 10.2 on a wide screen, and further out still on a
+   * larger one.
+   *
+   * Clamping the centre is what the previous build did. The view may extend
+   * past the box near its edges, which is the point -- the box says where you
+   * may look from, not what may be on screen.
+   */
+  let clamping = false;
+
+  function clampCentre() {
+    if (clamping) return;
+
+    const [[west, south], [east, north]] = CITIES[currentCity].bbox;
+    const centre = map.getCenter();
+    const lng = Math.min(east, Math.max(west, centre.lng));
+    const lat = Math.min(north, Math.max(south, centre.lat));
+    if (lng === centre.lng && lat === centre.lat) return;
+
+    // setCenter fires another move; the flag stops it recursing.
+    clamping = true;
+    map.setCenter([lng, lat]);
+    clamping = false;
+  }
+
+  map.on('move', clampCentre);
 
   /*
    * Pointer moves can arrive faster than the screen repaints, and each one
@@ -134,17 +169,16 @@ export function createMap(container, { onSample, onLeave }) {
     onLeave();
   });
 
-  /**
-   * Move to a city and restrict the view to it.
-   *
-   * The existing bounds are lifted first: jumping to another city while the
-   * old box is still in force would drag the centre back inside it.
-   */
+  /** Move to a city, and clamp to that city's box from then on. */
   function setCity(name) {
     const city = CITIES[name];
     if (!city) return;
 
-    map.setMaxBounds(null);
+    // Set first, so the jump is not dragged back towards the old city's box.
+    currentCity = name;
+
+    // Lifted while jumping: the new centre is outside the old minimum zoom's
+    // city, and a stale floor would fight the move.
     map.setMinZoom(null);
     map.jumpTo({
       center: [city.longitude, city.latitude],
@@ -153,7 +187,6 @@ export function createMap(container, { onSample, onLeave }) {
       bearing: 0,
     });
     map.setMinZoom(city.zoom);
-    map.setMaxBounds(city.bbox);
   }
 
   return { map, setCity };

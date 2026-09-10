@@ -107,16 +107,17 @@ npm install -g playwright && npx playwright install chromium
 
 ```sh
 npm run dev &                            # serves on :8000
-npm run test:browser                     # behaviour, and the hover pipeline
+npm run test:browser                     # behaviour, hover pipeline, map framing
 node test/capture.cjs  <url> <dir>       # screenshot a site across viewports
 node test/compare.cjs  <dirA> <dirB>     # compare two sets, pixel for pixel
 ```
 
 `test/colour-parity.cjs` compares against the libraries this replaced, so it
 reports a skip now that they are uninstalled; it passed across 140,699 samples
-at the time of the rewrite. `test/hover-pipeline.cjs` serves Mapbox a flat
-one-colour style so the real WebGL sampling path can be checked without
-depending on tiles or the network.
+at the time of the rewrite. `test/hover-pipeline.cjs` and
+`test/map-framing.cjs` serve Mapbox a flat one-colour style, so the real WebGL
+sampling path and the map's framing can be checked without depending on tiles
+or the network.
 
 `test/fixtures/gauge-original.svg` is the gauge as the previous build actually
 rendered it, kept as the reference. `test/fixtures/fonts/` is a local copy of
