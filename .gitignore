@@ -21,3 +21,7 @@
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+
+# Screenshot output: regenerable from the harness, too large to track.
+test/screens/
+test/diff/
