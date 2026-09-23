@@ -542,13 +542,19 @@ html.no-js .panel-sources > [data-city]:not([data-city="paris"]) {
   background: rgba(0, 0, 0, 0.45);
 }
 
+/*
+ * Sized by its content. It used to be pinned to a flat 350px, which left about
+ * 150px of empty white below the buttons on a desktop screen and rather more
+ * of the page hidden behind it than needed to be.
+ */
 .drawer-wrapper {
   position: absolute;
   left: 0;
   right: 0;
   bottom: 0;
   z-index: 1000;
-  height: 350px;
+  max-height: 90vh;
+  overflow-y: auto;
   box-shadow:
     0 -6px 16px 0 rgba(0, 0, 0, 0.08),
     0 -3px 6px -4px rgba(0, 0, 0, 0.12),
@@ -558,7 +564,6 @@ html.no-js .panel-sources > [data-city]:not([data-city="paris"]) {
 .drawer {
   display: flex;
   flex-direction: column;
-  height: 100%;
   font-family: var(--font-ui);
   font-size: 14px;
   color: var(--text);
@@ -585,7 +590,6 @@ html.no-js .panel-sources > [data-city]:not([data-city="paris"]) {
 }
 
 .drawer-body {
-  flex: 1;
   padding: 24px;
   font-size: 14px;
   line-height: 1.15;
