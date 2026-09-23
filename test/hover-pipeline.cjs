@@ -76,7 +76,7 @@ const flatStyle = (color) => JSON.stringify({
       needleShown: document.querySelector('.gaugePin')?.style.opacity === '1',
       tooltipShown: !document.getElementById('tooltip').hidden,
       swatch: document.querySelector('.tooltip-swatch')?.style.backgroundColor,
-      volume: Number(document.getElementById('noise-audio').volume.toFixed(6)),
+      volume: Number(window.__audio.volume.toFixed(6)),
     }));
 
     const measured = testCase.value > 0;
@@ -91,7 +91,7 @@ const flatStyle = (color) => JSON.stringify({
     await page.waitForTimeout(300);
     const off = await page.evaluate(() => ({
       tooltipShown: !document.getElementById('tooltip').hidden,
-      volume: document.getElementById('noise-audio').volume,
+      volume: window.__audio.volume,
     }));
     if (off.tooltipShown) problems.push('tooltip still shown after leaving the map');
     if (off.volume !== 0) problems.push(`volume ${off.volume} after leaving the map, expected 0`);
@@ -101,6 +101,53 @@ const flatStyle = (color) => JSON.stringify({
       + (problems.length ? '\n      ' + problems.join('\n      ') : `  (${actual.label || 'silent'}, volume ${actual.volume})`));
     if (problems.length) failures.push(testCase.color);
 
+    await context.close();
+  }
+
+  /*
+   * With sound actually turned on, volume has to travel through the Web Audio
+   * gain node rather than the element's own `volume` property, which iOS
+   * ignores. Check the graph is built and that the gain really carries the
+   * reading.
+   */
+  {
+    const context = await browser.newContext({ viewport: { width: 1200, height: 800 } });
+    const page = await context.newPage();
+    await page.route(/(api|events)\.mapbox\.com/, (route) => route.abort());
+    await page.route(/api\.mapbox\.com\/styles/, (route) =>
+      route.fulfill({ status: 200, contentType: 'application/json', body: flatStyle('#f768a1') }));
+    await page.route(/fonts\.(googleapis|gstatic)\.com|googletagmanager\.com/, (route) => route.abort());
+
+    await page.goto(`${BASE_URL}/`, { waitUntil: 'load' });
+    await page.getByRole('button', { name: /with sound/i }).click();
+    await page.waitForFunction(() => {
+      const canvas = document.querySelector('.mapboxgl-canvas');
+      if (!canvas) return false;
+      const gl = canvas.getContext('webgl2') || canvas.getContext('webgl');
+      if (!gl) return false;
+      const px = new Uint8Array(4);
+      gl.readPixels(Math.floor(canvas.width / 2), Math.floor(canvas.height / 2), 1, 1, gl.RGBA, gl.UNSIGNED_BYTE, px);
+      return px[0] + px[1] + px[2] > 0;
+    }, null, { timeout: 20000 });
+
+    await page.mouse.move(800, 400);
+    await page.waitForTimeout(300);
+
+    const audio = await page.evaluate(() => ({
+      usesGain: window.__audio.usesGain,
+      asked: window.__audio.volume,
+      elementVolume: document.getElementById('noise-audio').volume,
+      muted: document.getElementById('noise-audio').muted,
+    }));
+
+    const problems = [];
+    if (!audio.usesGain) problems.push('gain node not in use — volume would be ignored on iOS');
+    if (Math.abs(audio.asked - 0.55) > 1e-6) problems.push(`gain ${audio.asked}, expected 0.55`);
+    if (audio.elementVolume !== 1) problems.push(`element volume ${audio.elementVolume}, expected 1 so it does not scale the gain`);
+    if (audio.muted) problems.push('still muted after "With sound"');
+
+    console.log(`  gain path  ${problems.length ? 'FAIL\n      ' + problems.join('\n      ') : `ok  (gain ${audio.asked}, element volume held at 1)`}`);
+    if (problems.length) failures.push('gain path');
     await context.close();
   }
 

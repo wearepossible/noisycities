@@ -6,6 +6,7 @@
  * audio and URL in step with it.
  */
 
+import { createAudio } from './audio.js';
 import { nearestStepValue, volumeFor } from './colours.js';
 import { createGauge } from './gauge.js';
 import { createMap, CITIES, DEFAULT_CITY } from './map.js';
@@ -57,7 +58,9 @@ const state = {
 
 // --- Elements -------------------------------------------------------------
 
-const audio = document.getElementById('noise-audio');
+const audioElement = document.getElementById('noise-audio');
+const audio = createAudio(audioElement);
+if (typeof window !== 'undefined') window.__audio = audio; // exposed for tests
 const tooltip = document.getElementById('tooltip');
 const swatch = tooltip.querySelector('.tooltip-swatch');
 
@@ -83,7 +86,7 @@ function setReading(reading) {
   state.value = reading ? reading.value : null;
 
   gauge.setValue(state.value);
-  audio.volume = volumeFor(state.value ?? 0);
+  audio.setVolume(volumeFor(state.value ?? 0));
 
   if (reading) {
     showTooltip(reading.x, reading.y, reading.color);
@@ -127,17 +130,17 @@ const ui = createUi({
 
   onToggleMute() {
     state.muted = !state.muted;
-    audio.muted = state.muted;
+    audio.setMuted(state.muted);
+    // Unmuting is a gesture too, and may be the first one: it has to be able
+    // to start the audio context for someone who dismissed the intro silently.
+    if (!state.muted) audio.enable();
     update();
   },
 
   onEnableSound() {
     state.muted = false;
-    audio.muted = false;
-    // Autoplay with sound needs a gesture; this runs inside the button's click.
-    audio.play().catch(() => {
-      /* Blocked by the browser: the mute button remains available. */
-    });
+    audio.setMuted(false);
+    audio.enable();
     update();
   },
 });
@@ -161,8 +164,8 @@ function update() {
 
 // --- Start ----------------------------------------------------------------
 
-audio.muted = state.muted;
-audio.volume = 0;
+audio.setMuted(state.muted);
+audio.setVolume(0);
 
 if (state.city !== DEFAULT_CITY) setCity(state.city);
 update();
