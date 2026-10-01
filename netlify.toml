@@ -1,8 +1,7 @@
 [build]
-  command = "npm run build"
+  command = "npm ci && npm run build"
   publish = "build"
 
 [build.environment]
-  # Vite 6 requires a modern Node.js; pin to the current LTS so Netlify
-  # doesn't fall back to an older default that breaks the build.
+  # Only used to install Mapbox and run the copy script; nothing is compiled.
   NODE_VERSION = "22"
