@@ -55,6 +55,9 @@ const visibleText = (page, selector) =>
   check('switching city updates the URL',
     page.url().endsWith('#/?city=paris&language=fr'), page.url());
 
+  check('the document declares French while showing French',
+    (await page.evaluate(() => document.documentElement.lang)) === 'fr');
+
   check('switching city adds no history entry',
     (await page.evaluate(() => history.length)) === historyBefore);
 
@@ -70,6 +73,9 @@ const visibleText = (page, selector) =>
 
   check('the London tab is labelled per language',
     (await page.getByRole('button', { name: 'London', exact: true }).count()) === 1);
+
+  check('and English again when switched back',
+    (await page.evaluate(() => document.documentElement.lang)) === 'en');
 
   // The share links were taken out; nothing of them should be left behind.
   check('no share links anywhere', (await page.locator('.share, .share-block').count()) === 0);

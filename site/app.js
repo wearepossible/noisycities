@@ -147,15 +147,18 @@ const ui = createUi({
 
 function update() {
   /*
-   * The stylesheet needs the current language: the city tabs need a little
-   * less space between them in French, where "Londres" is wider.
+   * Two attributes, for two jobs.
    *
-   * Note this is deliberately NOT the `lang` attribute, which would be the
-   * accessible thing to set -- the document still claims English while showing
-   * French, as it always has. Setting it correctly changes how the browser
-   * renders French text, which would break the pixel-for-pixel match this
-   * rewrite is held to. Worth doing as its own change.
+   * `lang` is the honest one: it tells a screen reader which voice to read the
+   * page in and a search engine which language it has found. The previous
+   * build never changed it, so French was announced in an English accent and
+   * indexed as English.
+   *
+   * `data-language` is the stylesheet's, and has to stay separate: the city
+   * tabs need a little less space between them in French, where "Londres" is
+   * wider, and a rule can only match an attribute it is allowed to select on.
    */
+  document.documentElement.lang = state.language;
   document.documentElement.setAttribute('data-language', state.language);
 
   ui.render(state);

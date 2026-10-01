@@ -21,6 +21,7 @@
     "Segoe UI Symbol", "Noto Color Emoji";
   --text: rgba(0, 0, 0, 0.88);
   --brand-pink: #bc0978;
+  /* Ant Design's blue. All that is left of it is the drawer's primary button. */
   --accent-blue: #1677ff;
   --border: #d9d9d9;
 }
@@ -384,8 +385,13 @@ html.no-js .panel-sources > [data-city]:not([data-city="paris"]) {
   color: var(--brand-pink);
 }
 
+/*
+ * Pink, not Ant Design's blue. The previous build meant this to be pink --
+ * there were overrides for it in its stylesheet -- but they stopped matching
+ * when Ant Design renamed its classes, so the site rendered blue for years.
+ */
 .tab.is-active {
-  color: var(--accent-blue);
+  color: var(--brand-pink);
   font-weight: 500;
 }
 
@@ -394,7 +400,7 @@ html.no-js .panel-sources > [data-city]:not([data-city="paris"]) {
   position: absolute;
   bottom: 0;
   height: 2px;
-  background: var(--accent-blue);
+  background: var(--brand-pink);
   pointer-events: none;
   transition: left 0.3s, width 0.3s;
 }
