@@ -200,8 +200,17 @@ html.no-js .panel-sources > [data-city]:not([data-city="paris"]) {
    * swallowed the touch would leave a dead patch in the middle of the city.
    * The mute button inside it still takes a press.
    */
+  .legend-wrap {
+    right: 0;
+    bottom: 0;
+    width: auto;
+  }
+
   .legend {
-    transform: scale(0.64);
+    left: auto;
+    right: 6px;
+    bottom: 6px;
+    transform: scale(0.5);
     transform-origin: 100% 100%;
     pointer-events: none;
   }

@@ -14,8 +14,19 @@ const ACCESS_TOKEN =
 const STYLE = 'mapbox://styles/pfcrousse/ckymrthcs8bs614qpadigs2os';
 
 /**
- * Where each city sits, how far out you may zoom, and the box you may pan
- * within. Bounds are [[west, south], [east, north]].
+ * Where each city sits, how far out you may zoom, and two boxes.
+ *
+ * `bbox` is the box the map's centre is kept inside while panning. It is not
+ * the extent of the data and never was -- it is a little arbitrary, and it is
+ * left exactly as it has always been so desktop panning is unchanged.
+ *
+ * `data` is where the noise actually is, read from the bounds Mapbox reports
+ * for each city's raster tileset. A phone fits this, which is why the city now
+ * sits in the middle of the frame rather than half off the top of it. Using
+ * `bbox` for the fit framed New York to a box a third the size of its data and
+ * cut the Bronx off, and left Paris high with grey along the top.
+ *
+ * Both are [[west, south], [east, north]].
  */
 export const CITIES = {
   paris: {
@@ -23,18 +34,21 @@ export const CITIES = {
     latitude: 48.851,
     zoom: 10.2,
     bbox: [[2.0943827204, 48.7117011393], [2.6588734805, 49.035891562]],
+    data: [[2.142892, 48.644667], [2.616554, 49.012584]],
   },
   london: {
     longitude: -0.048,
     latitude: 51.491,
     zoom: 10,
     bbox: [[-0.5945770815, 51.2468407724], [0.3375120088, 51.7292587128]],
+    data: [[-0.544443, 51.265005], [0.335147, 51.717497]],
   },
   nyc: {
     longitude: -73.917,
     latitude: 40.710,
     zoom: 10,
     bbox: [[-74.2740753571, 40.4853136705], [-73.8192439591, 40.8276099713]],
+    data: [[-74.442611, 40.307184], [-73.467639, 41.066593]],
   },
 };
 
@@ -142,7 +156,10 @@ export function createMap(container, { onSample, onLeave }) {
   function clampCentre() {
     if (clamping) return;
 
-    const [[west, south], [east, north]] = CITIES[currentCity].bbox;
+    // On a phone the city was fitted to its data, so that is the box a pinch
+    // must stay inside; elsewhere it is the panning box, unchanged.
+    const city = CITIES[currentCity];
+    const [[west, south], [east, north]] = phone.matches ? city.data : city.bbox;
     const centre = map.getCenter();
     const lng = Math.min(east, Math.max(west, centre.lng));
     const lat = Math.min(north, Math.max(south, centre.lat));
@@ -159,16 +176,24 @@ export function createMap(container, { onSample, onLeave }) {
   /** Turn the panning and zooming gestures on or off to suit the screen. */
   function applyInteraction() {
     if (phone.matches) {
-      // The view is fixed, so every gesture that would move it is off. What is
-      // left is a finger reading the map.
+      /*
+       * Dragging reads the map rather than moving it, so panning is off. Pinch
+       * is not: it is the one gesture that cannot be confused with a sweep of
+       * the finger, and zooming in is how you pick out a single street.
+       *
+       * Rotation goes with it -- a tilted north serves nothing here -- and so
+       * does double-tap, which would otherwise fire when someone taps twice in
+       * quick succession while reading the map.
+       */
       map.dragPan.disable();
       map.scrollZoom.disable();
-      map.touchZoomRotate.disable();
       map.doubleClickZoom.disable();
       map.dragRotate.disable();
       if (map.touchPitch) map.touchPitch.disable();
+      map.touchZoomRotate.enable();
+      map.touchZoomRotate.disableRotation();
 
-      // Nothing for the zoom buttons to do once the view is locked.
+      // Pinch covers zooming on a touchscreen; the buttons are just clutter.
       if (navigation) {
         map.removeControl(navigation);
         navigation = null;
@@ -205,10 +230,12 @@ export function createMap(container, { onSample, onLeave }) {
     map.setMaxZoom(null);
 
     if (phone.matches) {
-      map.fitBounds(city.bbox, { padding: MOBILE_PADDING, animate: false, bearing: 0, pitch: 0 });
-      const fitted = map.getZoom();
-      map.setMinZoom(fitted);
-      map.setMaxZoom(fitted);
+      // The data, not the panning box: the city should sit centred in the
+      // frame and reach its edges.
+      map.fitBounds(city.data, { padding: MOBILE_PADDING, animate: false, bearing: 0, pitch: 0 });
+
+      // The whole city is as far out as you may go; pinching in is free.
+      map.setMinZoom(map.getZoom());
       return;
     }
 

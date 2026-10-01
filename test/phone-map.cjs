@@ -18,11 +18,15 @@ const { chromium } = require('./playwright.cjs');
 
 const BASE_URL = process.argv[2] || 'http://localhost:8080';
 
-/** Must match site/map.js. */
+/**
+ * The data extents from site/map.js -- what a phone fits, and what Mapbox
+ * reports as the bounds of each city's raster tileset. Not the panning boxes,
+ * which are a different thing and much smaller for New York.
+ */
 const CITIES = {
-  paris: [[2.0943827204, 48.7117011393], [2.6588734805, 49.035891562]],
-  london: [[-0.5945770815, 51.2468407724], [0.3375120088, 51.7292587128]],
-  nyc: [[-74.2740753571, 40.4853136705], [-73.8192439591, 40.8276099713]],
+  paris: [[2.142892, 48.644667], [2.616554, 49.012584]],
+  london: [[-0.544443, 51.265005], [0.335147, 51.717497]],
+  nyc: [[-74.442611, 40.307184], [-73.467639, 41.066593]],
 };
 
 const PHONES = [
@@ -88,7 +92,7 @@ async function touchDrag(page, path) {
         return {
           west: bounds.getWest(), east: bounds.getEast(),
           south: bounds.getSouth(), north: bounds.getNorth(),
-          minZoom: map.getMinZoom(), maxZoom: map.getMaxZoom(),
+          zoom: map.getZoom(), minZoom: map.getMinZoom(), maxZoom: map.getMaxZoom(),
           dragPan: map.dragPan.isEnabled(),
           pinch: map.touchZoomRotate.isEnabled(),
           scroll: map.scrollZoom.isEnabled(),
@@ -102,9 +106,13 @@ async function touchDrag(page, path) {
         || view.south > south + EPSILON || view.north < north - EPSILON) {
         problems.push(`${where}: the whole city is not on screen`);
       }
-      if (view.minZoom !== view.maxZoom) problems.push(`${where}: zoom is not locked`);
+      // Zoomed all the way out, so the whole city is the furthest you can go.
+      if (Math.abs(view.zoom - view.minZoom) > 1e-6) {
+        problems.push(`${where}: opens at ${view.zoom}, not its minimum ${view.minZoom}`);
+      }
+      if (view.maxZoom <= view.minZoom) problems.push(`${where}: no room left to pinch in`);
       if (view.dragPan) problems.push(`${where}: dragging still pans`);
-      if (view.pinch) problems.push(`${where}: pinch zoom still enabled`);
+      if (!view.pinch) problems.push(`${where}: pinch to zoom is disabled`);
       if (view.scroll) problems.push(`${where}: scroll zoom still enabled`);
       if (view.navControl) problems.push(`${where}: zoom buttons still shown on a locked map`);
     }
