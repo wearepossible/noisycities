@@ -16,15 +16,20 @@ const STYLE = 'mapbox://styles/pfcrousse/ckymrthcs8bs614qpadigs2os';
 /**
  * Where each city sits, how far out you may zoom, and two boxes.
  *
- * `bbox` is the box the map's centre is kept inside while panning. It is not
- * the extent of the data and never was -- it is a little arbitrary, and it is
- * left exactly as it has always been so desktop panning is unchanged.
+ * `bbox` is the box the map's centre is kept inside while panning on a
+ * desktop. It is not the extent of the data and never was -- it is a little
+ * arbitrary, and it is left exactly as it has always been so desktop panning
+ * is unchanged.
  *
- * `data` is where the noise actually is, read from the bounds Mapbox reports
- * for each city's raster tileset. A phone fits this, which is why the city now
- * sits in the middle of the frame rather than half off the top of it. Using
- * `bbox` for the fit framed New York to a box a third the size of its data and
- * cut the Bronx off, and left Paris high with grey along the top.
+ * `data` is where the noise actually is, and a phone fits the whole of it.
+ * These are measured rather than declared: each city's raster tileset was
+ * downloaded at zoom 10 -- about 150m a pixel -- and scanned for the
+ * outermost pixel carrying any ink at all. The bounds Mapbox reports for a
+ * tileset are the extent of the image it was cut from, and for New York that
+ * is a canvas nearly twice the size of the city. Fitting those zoomed out
+ * 1.75x too far, and showed a faint band of texture along the top where the
+ * empty margin ends, well north of anything painted. Paris's reported bounds
+ * happened to match its ink; London's were about a tenth too generous.
  *
  * Both are [[west, south], [east, north]].
  */
@@ -34,21 +39,21 @@ export const CITIES = {
     latitude: 48.851,
     zoom: 10.2,
     bbox: [[2.0943827204, 48.7117011393], [2.6588734805, 49.035891562]],
-    data: [[2.142892, 48.644667], [2.616554, 49.012584]],
+    data: [[2.145081, 48.645613], [2.616119, 49.012654]],
   },
   london: {
     longitude: -0.048,
     latitude: 51.491,
     zoom: 10,
     bbox: [[-0.5945770815, 51.2468407724], [0.3375120088, 51.7292587128]],
-    data: [[-0.544443, 51.265005], [0.335147, 51.717497]],
+    data: [[-0.510864, 51.289406], [0.307617, 51.692990]],
   },
   nyc: {
     longitude: -73.917,
     latitude: 40.710,
     zoom: 10,
     bbox: [[-74.2740753571, 40.4853136705], [-73.8192439591, 40.8276099713]],
-    data: [[-74.442611, 40.307184], [-73.467639, 41.066593]],
+    data: [[-74.256592, 40.496048], [-73.700409, 40.915588]],
   },
 };
 
@@ -114,6 +119,8 @@ export function createMap(container, { onSample, onLeave }) {
     minZoom: start.zoom,
     // Required by readPixel above.
     preserveDrawingBuffer: true,
+    // Added by hand below, so that it can change corner. See placeAttribution.
+    attributionControl: false,
   });
 
   if (typeof window !== 'undefined') window.__map = map; // exposed for tests
@@ -128,8 +135,8 @@ export function createMap(container, { onSample, onLeave }) {
    * so it lands halfway into the city with no way to see the rest: you could
    * pan, but panning to find the loud parts is a poor way to meet a map whose
    * whole point is sweeping across it. So on a phone the view is fitted to the
-   * entire city and locked there, dragging no longer pans, and moving a finger
-   * over the map reads it the way a mouse does on a desktop.
+   * entire city and pinned there, a finger dragged across it reads it the way
+   * a mouse does on a desktop, and moving the map is left to two fingers.
    *
    * The boundary is the same one the layout already uses, so a narrow desktop
    * window behaves like a phone. That is deliberate: it keys off the space
@@ -139,57 +146,152 @@ export function createMap(container, { onSample, onLeave }) {
   let navigation = null;
 
   /*
-   * Keep the map's centre inside the city's box.
+   * Mapbox pins its credit control to the bottom right, which is where the
+   * dial sits on a phone, and draws it above the dial. So on a phone it moves
+   * to the bottom left, beside the Mapbox wordmark that is already there --
+   * Mapbox lays the two out side by side itself. Switching the map's own
+   * control off at construction is the only way to get hold of it; its corner
+   * is otherwise fixed for the life of the map.
+   */
+  const attribution = new mapboxgl.AttributionControl();
+  let attributionCorner = null;
+
+  function placeAttribution(corner) {
+    if (attributionCorner === corner) return;
+    if (attributionCorner) map.removeControl(attribution);
+    map.addControl(attribution, corner);
+    attributionCorner = corner;
+  }
+
+  /*
+   * Keep the view inside the city.
    *
-   * Mapbox's own maxBounds would be the obvious tool, but it constrains the
-   * whole viewport rather than the centre: it zooms in until the box fills the
+   * A desktop keeps the map's *centre* inside the city's panning box. Mapbox's
+   * own maxBounds would be the obvious tool, but it constrains the whole
+   * viewport rather than the centre: it zooms in until the box fills the
    * window, which overrides the framing each city was given. Paris rendered at
    * zoom 10.4 instead of 10.2 on a wide screen, and further out still on a
-   * larger one.
+   * larger one. Clamping the centre is what the previous build did. The view
+   * may extend past the box near its edges, which is the point -- the box says
+   * where you may look from, not what may be on screen.
    *
-   * Clamping the centre is what the previous build did. The view may extend
-   * past the box near its edges, which is the point -- the box says where you
-   * may look from, not what may be on screen.
+   * A phone keeps the whole *view* inside the city's data instead. A
+   * centre-only clamp was harmless while nothing on a phone could pan, but two
+   * fingers can now, and the centre is free to roam a box half the city wide
+   * -- enough to drag the city most of the way off the screen. Where the view
+   * is larger than the city on an axis, which it always is at the zoom where
+   * all of it fits, the city is centred on that axis rather than clamped. That
+   * is what holds it in the middle of the frame.
    */
   let clamping = false;
 
-  function clampCentre() {
+  /**
+   * Hold `value` so that it keeps `before` ahead of `lo` and `after` behind
+   * `hi`. Too big a span to fit between them means sitting in the middle, with
+   * the overflow shared equally either side.
+   */
+  function fit(value, before, after, lo, hi) {
+    const low = lo + before;
+    const high = hi - after;
+    if (low > high) return (low + high) / 2;
+    return Math.min(high, Math.max(low, value));
+  }
+
+  /** Web Mercator y for a latitude. It grows southwards, unlike the latitude. */
+  function mercatorY(lat) {
+    return mapboxgl.MercatorCoordinate.fromLngLat([0, lat]).y;
+  }
+
+  function clampView() {
     if (clamping) return;
 
-    // On a phone the city was fitted to its data, so that is the box a pinch
-    // must stay inside; elsewhere it is the panning box, unchanged.
     const city = CITIES[currentCity];
-    const [[west, south], [east, north]] = phone.matches ? city.data : city.bbox;
     const centre = map.getCenter();
-    const lng = Math.min(east, Math.max(west, centre.lng));
-    const lat = Math.min(north, Math.max(south, centre.lat));
-    if (lng === centre.lng && lat === centre.lat) return;
 
-    // setCenter fires another move; the flag stops it recursing.
+    if (!phone.matches) {
+      const [[west, south], [east, north]] = city.bbox;
+      const lng = Math.min(east, Math.max(west, centre.lng));
+      const lat = Math.min(north, Math.max(south, centre.lat));
+      if (lng === centre.lng && lat === centre.lat) return;
+
+      // setCenter fires another move; the flag stops it recursing.
+      clamping = true;
+      map.setCenter([lng, lat]);
+      clamping = false;
+      return;
+    }
+
+    const view = map.getBounds();
+    if (!view) return;
+    const [[west, south], [east, north]] = city.data;
+
+    // Longitude is linear in web Mercator, so degrees clamp directly.
+    const lng = fit(
+      centre.lng,
+      centre.lng - view.getWest(),
+      view.getEast() - centre.lng,
+      west,
+      east
+    );
+
+    // Latitude is not, so it is clamped in Mercator y. North is the smaller
+    // number there, which is why the city's edges go in the other way round.
+    const y = mercatorY(centre.lat);
+    const clampedY = fit(
+      y,
+      y - mercatorY(view.getNorth()),
+      mercatorY(view.getSouth()) - y,
+      mercatorY(north),
+      mercatorY(south)
+    );
+
+    // fit() returns its input untouched when nothing needs moving, so these
+    // compare exactly rather than within a tolerance.
+    if (lng === centre.lng && clampedY === y) return;
+
     clamping = true;
-    map.setCenter([lng, lat]);
+    map.setCenter([lng, new mapboxgl.MercatorCoordinate(0, clampedY).toLngLat().lat]);
     clamping = false;
   }
 
-  map.on('move', clampCentre);
+  map.on('move', clampView);
 
-  /** Turn the panning and zooming gestures on or off to suit the screen. */
+  /** Set the panning and zooming gestures, and the controls, to suit the screen. */
   function applyInteraction() {
     if (phone.matches) {
       /*
-       * Dragging reads the map rather than moving it, so panning is off. Pinch
-       * is not: it is the one gesture that cannot be confused with a sweep of
-       * the finger, and zooming in is how you pick out a single street.
+       * One finger reads the map rather than moving it, so a one-finger pan is
+       * off. Two fingers still pan: a pinch that zooms without the map
+       * following the fingers feels broken, and zooming in is how you pick out
+       * a single street.
        *
-       * Rotation goes with it -- a tilted north serves nothing here -- and so
-       * does double-tap, which would otherwise fire when someone taps twice in
+       * Both of those come from Mapbox's cooperative gestures, which is its
+       * switch for exactly this -- the touch-pan handler drops a one-finger
+       * pan while it is set and keeps a two-finger one. Drag-pan has to be
+       * enabled for either to happen, and enabling it matters for a second
+       * reason: Mapbox sets the canvas's touch-action from which handlers are
+       * on, and with pinch alone it hands drags to the browser to scroll the
+       * page with. (The stylesheet puts that back, for the one case Mapbox
+       * then gets wrong. See styles.css.)
+       *
+       * Rotation goes too -- a tilted north serves nothing here -- and so does
+       * double-tap, which would otherwise fire when someone taps twice in
        * quick succession while reading the map.
        */
-      map.dragPan.disable();
+
+      /*
+       * Scroll zoom goes first, before the flag. Disabling it while
+       * cooperative gestures are set reaches for an alert element that only
+       * exists if they were set back when it was enabled, and throws when it
+       * is not there.
+       */
       map.scrollZoom.disable();
       map.doubleClickZoom.disable();
       map.dragRotate.disable();
       if (map.touchPitch) map.touchPitch.disable();
+
+      map.setCooperativeGestures(true);
+      map.dragPan.enable();
       map.touchZoomRotate.enable();
       map.touchZoomRotate.disableRotation();
 
@@ -198,19 +300,33 @@ export function createMap(container, { onSample, onLeave }) {
         map.removeControl(navigation);
         navigation = null;
       }
+
+      placeAttribution('bottom-left');
       return;
     }
+
+    /*
+     * Drag-pan goes first here, while the flag is still set: disabling it is
+     * what takes the one-finger blocker and its two classes back off the
+     * canvas, and it only does that while cooperative gestures are on.
+     */
+    map.dragPan.disable();
+    map.setCooperativeGestures(false);
 
     map.dragPan.enable();
     map.scrollZoom.enable();
     map.touchZoomRotate.enable();
+    map.touchZoomRotate.enableRotation();
     map.doubleClickZoom.enable();
     map.dragRotate.enable();
+    if (map.touchPitch) map.touchPitch.enable();
 
     if (!navigation) {
       navigation = new mapboxgl.NavigationControl();
       map.addControl(navigation, 'top-left');
     }
+
+    placeAttribution('bottom-right');
   }
 
   /**
@@ -294,6 +410,19 @@ export function createMap(container, { onSample, onLeave }) {
    */
   function scrub(event) {
     if (!phone.matches) return;
+
+    /*
+     * One finger only. A touch event's point is the centroid of every finger
+     * down, so a second one turns the reading into the midpoint between them
+     * -- somewhere nobody pointed at -- and would put back the readout that
+     * starting to pan has just taken away.
+     */
+    if (event.originalEvent.touches.length > 1) {
+      pendingPoint = null;
+      onLeave();
+      return;
+    }
+
     pendingPoint = event.point;
     if (!frame) frame = requestAnimationFrame(sampleLatest);
   }

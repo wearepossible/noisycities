@@ -170,11 +170,35 @@ html.no-js .panel-sources > [data-city]:not([data-city="paris"]) {
     touch-action: none;
   }
 
+  /*
+   * Mapbox sets touch-action on the canvas itself from which gesture handlers
+   * are on, which beats the container's. Cooperative gestures -- what stops
+   * one finger panning -- assume the page should scroll instead, and hand
+   * drags back to the browser. Here one finger is reading the map, so it must
+   * not. An id beats the four classes Mapbox uses, so no !important.
+   */
+  #map .mapboxgl-canvas-container,
+  #map .mapboxgl-canvas {
+    touch-action: none;
+  }
+
+  /*
+   * And the overlay that goes with them: "Use two fingers to move the map"
+   * darkens the whole map for half a second, and would fire on every sweep of
+   * a finger. The message is wrong here anyway -- one finger has a job.
+   */
+  #map .mapboxgl-touch-pan-blocker {
+    display: none;
+  }
+
   .panel-sources { order: 3; }
 
-  /* The logo ran to the full width and ate the top of the screen. */
+  /*
+   * The logo ran to the full width and ate the top of the screen. Only the
+   * cap does any work -- a width here would have to come after the base rule
+   * further down the file to beat it, and 240px is the size that was wanted.
+   */
   .logo-carfree {
-    width: 50%;
     max-width: 240px;
   }
 
@@ -191,33 +215,7 @@ html.no-js .panel-sources > [data-city]:not([data-city="paris"]) {
     display: none !important;
   }
 
-  /*
-   * At its full 250px the dial covered most of a phone-sized map, and all of a
-   * short one in landscape, so it is scaled down towards its corner.
-   *
-   * It also stops taking the touch. It is a readout rather than a control, and
-   * now that the map is read by sweeping a finger over it, a dial that
-   * swallowed the touch would leave a dead patch in the middle of the city.
-   * The mute button inside it still takes a press.
-   */
-  .legend-wrap {
-    right: 0;
-    bottom: 0;
-    width: auto;
-  }
-
-  .legend {
-    left: auto;
-    right: 6px;
-    bottom: 6px;
-    transform: scale(0.5);
-    transform-origin: 100% 100%;
-    pointer-events: none;
-  }
-
-  .legend-mute {
-    pointer-events: auto;
-  }
+  /* The legend's own rules are in the Legend section, which comes later. */
 }
 
 /* --- Buttons ------------------------------------------------------------- */
@@ -496,23 +494,6 @@ html.no-js .panel-sources > [data-city]:not([data-city="paris"]) {
   width: 300px;
 }
 
-/*
- * On narrow screens the map pane is 60vh, which is rarely a whole number of
- * pixels. The legend hangs off the bottom of it, so a fractional height leaves
- * the dial straddling a half pixel and softens every edge of it. Shifting it
- * by the remainder lands it back on a whole pixel -- up where 60vh rounds down,
- * down where it rounds up. deck.gl used to size its own container in whole
- * pixels, so this never arose before.
- *
- * Where round() is unsupported the whole declaration is ignored and the legend
- * simply sits where it otherwise would.
- */
-@media (max-width: 899.98px) {
-  .legend-wrap {
-    bottom: calc(60vh - round(60vh, 1px));
-  }
-}
-
 .legend {
   position: absolute;
   left: 20px;
@@ -539,6 +520,49 @@ html.no-js .panel-sources > [data-city]:not([data-city="paris"]) {
   width: 100%;
   margin-left: -5px;
   text-align: center;
+}
+
+/*
+ * The dial on a phone. These have to come after the rules above rather than
+ * live with the rest of the mobile layout further up the file: a media query
+ * adds no specificity, so the plain rules above would otherwise win on source
+ * order alone and the dial would never move.
+ *
+ * At its full 250px it covered most of a phone-sized map, and all of a short
+ * one in landscape, so it is halved and tucked into the corner. The transform
+ * grows from that corner, so right and bottom are where its visible edges
+ * land.
+ *
+ * It also stops taking the touch. It is a readout rather than a control, and
+ * now that the map is read by sweeping a finger over it, a dial that
+ * swallowed the touch would leave a dead patch in the middle of the city. The
+ * mute button inside it still takes a press.
+ *
+ * The map pane is 60vh, which is rarely a whole number of pixels, and the
+ * legend hangs off the bottom of it -- a fractional height would leave the
+ * dial straddling a half pixel and soften every edge of it. Shifting the
+ * wrapper by the remainder lands it back on a whole pixel. Where round() is
+ * unsupported that one declaration is ignored and nothing else changes.
+ */
+@media (max-width: 899.98px) {
+  .legend-wrap {
+    right: 0;
+    width: auto;
+    bottom: calc(60vh - round(60vh, 1px));
+  }
+
+  .legend {
+    left: auto;
+    right: 4px;
+    bottom: 4px;
+    transform: scale(0.5);
+    transform-origin: 100% 100%;
+    pointer-events: none;
+  }
+
+  .legend-mute {
+    pointer-events: auto;
+  }
 }
 
 /* --- Hover tooltip on the mute button ------------------------------------ */
