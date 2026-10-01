@@ -40,6 +40,12 @@ export const CITIES = {
 
 export const DEFAULT_CITY = 'paris';
 
+/** The width below which the layout stacks and the map becomes a phone map. */
+const MOBILE_QUERY = '(max-width: 899.98px)';
+
+/** Breathing room around the city when the whole of it is fitted on screen. */
+const MOBILE_PADDING = 12;
+
 /**
  * Read the colour of a single pixel out of the map's WebGL buffer.
  *
@@ -97,11 +103,26 @@ export function createMap(container, { onSample, onLeave }) {
   });
 
   if (typeof window !== 'undefined') window.__map = map; // exposed for tests
-  if (typeof window !== 'undefined') window.__map = map; // exposed for tests
-  map.addControl(new mapboxgl.NavigationControl(), 'top-left');
   map.getCanvas().style.cursor = 'crosshair';
 
   let currentCity = DEFAULT_CITY;
+
+  /*
+   * Phones behave differently enough to be worth stating plainly.
+   *
+   * On a narrow screen the per-city zoom was chosen for a wide desktop pane,
+   * so it lands halfway into the city with no way to see the rest: you could
+   * pan, but panning to find the loud parts is a poor way to meet a map whose
+   * whole point is sweeping across it. So on a phone the view is fitted to the
+   * entire city and locked there, dragging no longer pans, and moving a finger
+   * over the map reads it the way a mouse does on a desktop.
+   *
+   * The boundary is the same one the layout already uses, so a narrow desktop
+   * window behaves like a phone. That is deliberate: it keys off the space
+   * available rather than sniffing at the device.
+   */
+  const phone = window.matchMedia(MOBILE_QUERY);
+  let navigation = null;
 
   /*
    * Keep the map's centre inside the city's box.
@@ -135,6 +156,79 @@ export function createMap(container, { onSample, onLeave }) {
 
   map.on('move', clampCentre);
 
+  /** Turn the panning and zooming gestures on or off to suit the screen. */
+  function applyInteraction() {
+    if (phone.matches) {
+      // The view is fixed, so every gesture that would move it is off. What is
+      // left is a finger reading the map.
+      map.dragPan.disable();
+      map.scrollZoom.disable();
+      map.touchZoomRotate.disable();
+      map.doubleClickZoom.disable();
+      map.dragRotate.disable();
+      if (map.touchPitch) map.touchPitch.disable();
+
+      // Nothing for the zoom buttons to do once the view is locked.
+      if (navigation) {
+        map.removeControl(navigation);
+        navigation = null;
+      }
+      return;
+    }
+
+    map.dragPan.enable();
+    map.scrollZoom.enable();
+    map.touchZoomRotate.enable();
+    map.doubleClickZoom.enable();
+    map.dragRotate.enable();
+
+    if (!navigation) {
+      navigation = new mapboxgl.NavigationControl();
+      map.addControl(navigation, 'top-left');
+    }
+  }
+
+  /**
+   * Put a city on screen.
+   *
+   * On a desktop that means the centre and zoom the city was given. On a phone
+   * it means the whole of its box, at whatever zoom that takes, with the zoom
+   * pinned there so the view cannot drift.
+   */
+  function frameCity(name) {
+    const city = CITIES[name];
+    if (!city) return;
+
+    // Lifted first: a stale floor or ceiling from the previous city would
+    // fight the move.
+    map.setMinZoom(null);
+    map.setMaxZoom(null);
+
+    if (phone.matches) {
+      map.fitBounds(city.bbox, { padding: MOBILE_PADDING, animate: false, bearing: 0, pitch: 0 });
+      const fitted = map.getZoom();
+      map.setMinZoom(fitted);
+      map.setMaxZoom(fitted);
+      return;
+    }
+
+    /*
+     * Clear any padding the phone fit left behind. It is camera padding, not a
+     * one-off argument, so it persists: a window dragged wider than the
+     * breakpoint would otherwise keep rendering the desktop view offset by
+     * half of it, which getCenter() does not reveal because it reports the
+     * camera rather than what is drawn.
+     */
+    map.setPadding({ top: 0, bottom: 0, left: 0, right: 0 });
+    map.jumpTo({
+      center: [city.longitude, city.latitude],
+      zoom: city.zoom,
+      pitch: 0,
+      bearing: 0,
+    });
+    map.setMinZoom(city.zoom);
+  }
+
   /*
    * Pointer moves can arrive faster than the screen repaints, and each one
    * costs a synchronous GL read. Keep only the latest and sample it once per
@@ -163,6 +257,31 @@ export function createMap(container, { onSample, onLeave }) {
     onLeave();
   });
 
+  /*
+   * Reading the map with a finger. Only on a phone: where the map can still be
+   * panned, a drag has to stay a drag.
+   *
+   * The map's own container sets touch-action to none at this width, without
+   * which the browser would scroll the page out from under the finger rather
+   * than let it sweep across the city.
+   */
+  function scrub(event) {
+    if (!phone.matches) return;
+    pendingPoint = event.point;
+    if (!frame) frame = requestAnimationFrame(sampleLatest);
+  }
+
+  map.on('touchstart', scrub);
+  map.on('touchmove', scrub);
+
+  for (const ending of ['touchend', 'touchcancel']) {
+    map.on(ending, () => {
+      if (!phone.matches) return;
+      pendingPoint = null;
+      onLeave();
+    });
+  }
+
   // Hide the readout while dragging, as the previous build did.
   map.on('dragstart', () => {
     pendingPoint = null;
@@ -171,23 +290,34 @@ export function createMap(container, { onSample, onLeave }) {
 
   /** Move to a city, and clamp to that city's box from then on. */
   function setCity(name) {
-    const city = CITIES[name];
-    if (!city) return;
+    if (!CITIES[name]) return;
 
-    // Set first, so the jump is not dragged back towards the old city's box.
+    // Set first, so the move is not dragged back towards the old city's box.
     currentCity = name;
-
-    // Lifted while jumping: the new centre is outside the old minimum zoom's
-    // city, and a stale floor would fight the move.
-    map.setMinZoom(null);
-    map.jumpTo({
-      center: [city.longitude, city.latitude],
-      zoom: city.zoom,
-      pitch: 0,
-      bearing: 0,
-    });
-    map.setMinZoom(city.zoom);
+    frameCity(name);
   }
+
+  /*
+   * A phone's fitted zoom depends on the size of the map, so turning the
+   * handset has to re-fit it. Coalesced to a frame: resize fires in bursts.
+   */
+  let refit = 0;
+  window.addEventListener('resize', () => {
+    if (!phone.matches || refit) return;
+    refit = requestAnimationFrame(() => {
+      refit = 0;
+      frameCity(currentCity);
+    });
+  });
+
+  // Crossing the breakpoint swaps both the gestures and the framing.
+  phone.addEventListener('change', () => {
+    applyInteraction();
+    frameCity(currentCity);
+  });
+
+  applyInteraction();
+  frameCity(currentCity);
 
   return { map, setCity };
 }

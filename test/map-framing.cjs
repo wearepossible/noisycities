@@ -29,7 +29,12 @@ const CITIES = {
     bbox: [[-74.2740753571, 40.4853136705], [-73.8192439591, 40.8276099713]] },
 };
 
-const VIEWPORTS = [[1920, 1080], [1440, 900], [1024, 768], [390, 844]];
+/*
+ * Desktop widths only. Below the layout breakpoint the map is fitted to the
+ * whole city and locked instead of using the city's stored zoom, which
+ * test/phone-map.cjs covers.
+ */
+const VIEWPORTS = [[1920, 1080], [1440, 900], [1024, 768], [960, 800]];
 
 const FLAT_STYLE = JSON.stringify({
   version: 8, name: 'flat', sources: {},

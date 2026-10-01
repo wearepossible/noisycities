@@ -167,5 +167,7 @@ function update() {
 audio.setMuted(state.muted);
 audio.setVolume(0);
 
-if (state.city !== DEFAULT_CITY) setCity(state.city);
+// Always, not just for a city other than the default: on a phone the opening
+// view has to be fitted to the city rather than taken from its stored zoom.
+setCity(state.city);
 update();

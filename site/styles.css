@@ -147,22 +147,68 @@ html.no-js .panel-sources > [data-city]:not([data-city="paris"]) {
     order: 2;
     flex: 0 0 100%;
     max-width: 100%;
-    height: 90vh;
+    /*
+     * Shorter than the 90vh it used to be, and deliberately well short of the
+     * screen. Dragging on the map now reads it rather than scrolling the page,
+     * so there has to be enough page left around it to scroll from. The city
+     * is fitted to the map's width on a phone, so the height given up here
+     * costs almost nothing in how much of the city you can see.
+     */
+    height: 60vh;
   }
 
   /*
-   * The pane keeps its exact 90vh so the sources panel below it starts in the
+   * The pane keeps its exact 60vh so the sources panel below it starts in the
    * same place; the map inside is rounded to the nearest whole pixel, so
    * Mapbox's canvas and its controls land on the pixel grid rather than a
    * fraction of one. deck.gl used to size its container this way, and to the
-   * nearest pixel rather than down -- at 844px tall, 90vh is 759.6 and the old
-   * container was 760.
+   * nearest pixel rather than down.
    */
   #map {
-    height: round(90vh, 1px);
+    height: round(60vh, 1px);
+    /* Sweeping a finger across the map must not scroll the page under it. */
+    touch-action: none;
   }
 
   .panel-sources { order: 3; }
+
+  /* The logo ran to the full width and ate the top of the screen. */
+  .logo-carfree {
+    width: 50%;
+    max-width: 240px;
+  }
+
+  /*
+   * The three short paragraphs run together as one, which buys back two gaps
+   * without keeping a second copy of the words anywhere.
+   */
+  .intro-text p {
+    display: inline;
+  }
+
+  /* Sharing is desktop-only here: on a phone the vertical space is worth more. */
+  .share-block {
+    display: none !important;
+  }
+
+  /*
+   * At its full 250px the dial covered most of a phone-sized map, and all of a
+   * short one in landscape, so it is scaled down towards its corner.
+   *
+   * It also stops taking the touch. It is a readout rather than a control, and
+   * now that the map is read by sweeping a finger over it, a dial that
+   * swallowed the touch would leave a dead patch in the middle of the city.
+   * The mute button inside it still takes a press.
+   */
+  .legend {
+    transform: scale(0.64);
+    transform-origin: 100% 100%;
+    pointer-events: none;
+  }
+
+  .legend-mute {
+    pointer-events: auto;
+  }
 }
 
 /* --- Buttons ------------------------------------------------------------- */
@@ -442,10 +488,10 @@ html.no-js .panel-sources > [data-city]:not([data-city="paris"]) {
 }
 
 /*
- * On narrow screens the map pane is 90vh, which is rarely a whole number of
+ * On narrow screens the map pane is 60vh, which is rarely a whole number of
  * pixels. The legend hangs off the bottom of it, so a fractional height leaves
  * the dial straddling a half pixel and softens every edge of it. Shifting it
- * by the remainder lands it back on a whole pixel -- up where 90vh rounds down,
+ * by the remainder lands it back on a whole pixel -- up where 60vh rounds down,
  * down where it rounds up. deck.gl used to size its own container in whole
  * pixels, so this never arose before.
  *
@@ -454,7 +500,7 @@ html.no-js .panel-sources > [data-city]:not([data-city="paris"]) {
  */
 @media (max-width: 899.98px) {
   .legend-wrap {
-    bottom: calc(90vh - round(90vh, 1px));
+    bottom: calc(60vh - round(60vh, 1px));
   }
 }
 
