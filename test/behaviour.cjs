@@ -71,24 +71,8 @@ const visibleText = (page, selector) =>
   check('the London tab is labelled per language',
     (await page.getByRole('button', { name: 'London', exact: true }).count()) === 1);
 
-  // --- Share links ----------------------------------------------------------
-  const shareHrefs = await page.locator('.share:visible').evaluateAll((links) =>
-    links.map((a) => a.href));
-  check('three share links, each to the right network',
-    shareHrefs.length === 3
-      && shareHrefs[0].startsWith('https://twitter.com/intent/tweet?url=')
-      && shareHrefs[1].startsWith('https://www.facebook.com/sharer/sharer.php?u=')
-      && shareHrefs[2].startsWith('https://linkedin.com/shareArticle?url='),
-    shareHrefs.join('\n         '));
-
-  check('share text follows the language',
-    decodeURIComponent(shareHrefs[0]).includes('Noise pollution is one of the biggest threats'));
-
-  await page.getByRole('button', { name: 'FR', exact: true }).click();
-  await page.waitForTimeout(400);
-  const frShare = await page.locator('.share:visible').first().getAttribute('href');
-  check('share text follows the language when switched',
-    decodeURIComponent(frShare).includes('La pollution sonore'));
+  // The share links were taken out; nothing of them should be left behind.
+  check('no share links anywhere', (await page.locator('.share, .share-block').count()) === 0);
 
   // --- The drawer -----------------------------------------------------------
   await page.goto('about:blank');

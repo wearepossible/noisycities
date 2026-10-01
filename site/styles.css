@@ -210,11 +210,6 @@ html.no-js .panel-sources > [data-city]:not([data-city="paris"]) {
     display: inline;
   }
 
-  /* Sharing is desktop-only here: on a phone the vertical space is worth more. */
-  .share-block {
-    display: none !important;
-  }
-
   /* The legend's own rules are in the Legend section, which comes later. */
 }
 
@@ -402,23 +397,6 @@ html.no-js .panel-sources > [data-city]:not([data-city="paris"]) {
   background: var(--accent-blue);
   pointer-events: none;
   transition: left 0.3s, width 0.3s;
-}
-
-/* --- Share links --------------------------------------------------------- */
-
-.share-row {
-  display: flex;
-  align-items: flex-start;
-  flex-flow: row wrap;
-}
-
-.share-gap {
-  margin-right: 8px;
-}
-
-.share {
-  display: inline-block;
-  line-height: 0;
 }
 
 /* --- Sidebar credits ----------------------------------------------------- */

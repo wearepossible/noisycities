@@ -9,8 +9,8 @@ reading, which moves the gauge and sets how loud the city sounds.
 
 The only thing this site depends on is [Mapbox GL](https://docs.mapbox.com/mapbox-gl-js/),
 which draws the map. Everything else — the layout, the gauge, the tabs, the
-sharing links, the audio — is plain HTML, CSS and JavaScript, with no build
-step and nothing to compile.
+audio — is plain HTML, CSS and JavaScript, with no build step and nothing to
+compile.
 
 That is a deliberate choice, not an oversight. The site is finished. It gets
 occasional copy edits and nothing more, so the thing worth optimising for is
@@ -37,7 +37,7 @@ site/          the site itself, published exactly as written
   gauge.js     the decibel dial
   steps.js     the decibel scale — colours and labels live here
   colours.js   matching a pixel to a reading, and a reading to a volume
-  ui.js        tabs, language switch, share links, drawer, mute
+  ui.js        tabs, language switch, drawer, mute
   assets/      audio and logos
 test/          comparison harness (see below)
 build/         generated; not in version control
